@@ -4,6 +4,7 @@ import (
 	"dev-go-apis/internal/lib"
 	"dev-go-apis/internal/middleware"
 	"dev-go-apis/internal/module/auth"
+	"dev-go-apis/internal/module/cache"
 	"dev-go-apis/internal/module/permission"
 	"dev-go-apis/internal/module/role"
 	"dev-go-apis/internal/module/session"
@@ -32,7 +33,6 @@ func NewRouter(dbClient *sqlx.DB, cacheClient *redis.Client) *Router {
 	gin.SetMode(lib.GIN_MODE)
 	router := gin.Default()
 
-	router.Use(middleware.RecoveryMiddleware())
 	router.Use(middleware.ErrorsHandler())
 
 	return &Router{
@@ -57,6 +57,7 @@ func (r *Router) InitRoutes() http.Handler {
 	/**
 	 * Repositories
 	 */
+	cacheRepo := cache.NewCacheRepository(r.CacheClient)
 	userRepo := user.NewUserRepository(r.DBClient)
 	sessionRepo := session.NewSessionRepository(r.DBClient)
 	permissionRepo := permission.NewPermissionRepository(r.DBClient)
@@ -65,6 +66,7 @@ func (r *Router) InitRoutes() http.Handler {
 	/**
 	 * Services
 	 */
+	cacheService := cache.NewCacheService(cacheRepo)
 	authService := auth.NewAuthService(userRepo)
 	userService := user.NewUserService(userRepo)
 	sessionService := session.NewSessionService(sessionRepo)
@@ -76,7 +78,7 @@ func (r *Router) InitRoutes() http.Handler {
 	 */
 	routes := []IController{
 		auth.NewAuthController(authService, sessionService),
-		user.NewUserController(userService),
+		user.NewUserController(userService, cacheService),
 		permission.NewPermissionController(permissionService),
 		role.NewRoleController(roleService),
 	}

@@ -6,6 +6,7 @@ import (
 	"dev-go-apis/internal/models"
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -16,17 +17,23 @@ type IUserService interface {
 	GetUserPermissionsByRoleID(roleID int) ([]models.Permission, error)
 }
 
+type ICacheService interface {
+	SetValue(string, interface{}, time.Duration) error
+}
+
 type UserController struct {
-	Service IUserService
+	Service      IUserService
+	CacheService ICacheService
 }
 
 type GetUserByIDRequest struct {
 	ID string `uri:"id" binding:"required"`
 }
 
-func NewUserController(service IUserService) *UserController {
+func NewUserController(service IUserService, cacheService ICacheService) *UserController {
 	return &UserController{
-		Service: service,
+		Service:      service,
+		CacheService: cacheService,
 	}
 }
 
@@ -37,7 +44,8 @@ func (contl *UserController) RegisterRoutes(rg *gin.RouterGroup) {
 		middleware.AccessTokenHandler(),
 		middleware.PermissionHandler(
 			contl.Service,
-			lib.TempAdminDashboard,
+			contl.CacheService,
+			lib.AdminDashboard,
 		),
 		contl.GetMe,
 	)

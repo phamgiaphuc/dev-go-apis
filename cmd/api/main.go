@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"dev-go-apis/internal/cache"
 	"dev-go-apis/internal/database"
 	"dev-go-apis/internal/lib"
 	"dev-go-apis/internal/server"
@@ -50,7 +49,7 @@ func main() {
 	dbClient := database.NewDatabaseClient()
 	defer dbClient.Close()
 
-	cacheClient := cache.NewRedisClient()
+	cacheClient := database.NewRedisClient()
 	defer cacheClient.Close()
 
 	server := server.NewServer(dbClient, cacheClient)
