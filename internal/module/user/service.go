@@ -8,6 +8,7 @@ import (
 
 type IUserRepository interface {
 	GetUserByID(id uuid.UUID) (*models.UserWithAccounts, error)
+	GetUserPermissionsByRoleID(roleID int) ([]models.Permission, error)
 }
 
 type UserService struct {
@@ -22,4 +23,8 @@ func NewUserService(userRepo IUserRepository) *UserService {
 
 func (s *UserService) GetUserByID(id uuid.UUID) (*models.UserWithAccounts, error) {
 	return s.UserRepo.GetUserByID(id)
+}
+
+func (s *UserService) GetUserPermissionsByRoleID(roleID int) ([]models.Permission, error) {
+	return s.UserRepo.GetUserPermissionsByRoleID(roleID)
 }

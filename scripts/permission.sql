@@ -10,10 +10,14 @@ FROM "permission_groups" pg
 JOIN (
   VALUES
     ('dashboard:admin', 'Access admin dashboard'),
-    ('dashboard:user:read', 'Read user dashboard'),
-    ('dashboard:user:create', 'Create user dashboard'),
-    ('dashboard:user:edit', 'Edit user dashboard'),
-    ('dashboard:user:delete', 'Delete user dashboard')
+    ('dashboard:user:read', 'Read or access user list'),
+    ('dashboard:user:create', 'Create a user'),
+    ('dashboard:user:edit', 'Edit a user'),
+    ('dashboard:user:delete', 'Delete a user'),
+    ('dashboard:role:read', 'Read or access role list'),
+    ('dashboard:role:create', 'Create a role'),
+    ('dashboard:role:edit', 'Edit a role'),
+    ('dashboard:role:delete', 'Delete a role')
 ) AS p(name, description)
 ON (pg.name = 'dashboard:group')
 ON CONFLICT (name) DO NOTHING;
@@ -32,7 +36,11 @@ JOIN "permissions" p ON p.name IN (
   'dashboard:user:read',
   'dashboard:user:create',
   'dashboard:user:edit',
-  'dashboard:user:delete'
+  'dashboard:user:delete',
+  'dashboard:role:read',
+  'dashboard:role:create',
+  'dashboard:role:edit',
+  'dashboard:role:delete'
 )
 WHERE r.name = 'admin'
 ON CONFLICT (role_id, permission_id) DO NOTHING;

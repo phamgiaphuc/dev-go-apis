@@ -4,36 +4,7 @@ import (
 	"database/sql/driver"
 	"encoding/json"
 	"errors"
-	"fmt"
 )
-
-const (
-	DashboardGroup     = "dashboard:group"
-	UserDashboardGroup = "dashboard:user"
-)
-
-var (
-	ReadUserDashboard   = ReadPermission(UserDashboardGroup)
-	CreateUserDashboard = CreatePermission(UserDashboardGroup)
-	EditUserDashboard   = EditPermission(UserDashboardGroup)
-	DeleteUserDashboard = DeletePermission(UserDashboardGroup)
-)
-
-func ReadPermission(group string) string {
-	return fmt.Sprintf("%s:read", group)
-}
-
-func CreatePermission(group string) string {
-	return fmt.Sprintf("%s:create", group)
-}
-
-func EditPermission(group string) string {
-	return fmt.Sprintf("%s:edit", group)
-}
-
-func DeletePermission(group string) string {
-	return fmt.Sprintf("%s:delete", group)
-}
 
 type Permission struct {
 	ID          int    `db:"id" json:"id"`

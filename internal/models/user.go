@@ -21,24 +21,20 @@ type User struct {
 	Role string `json:"role"`
 }
 
+type UserWithPassword struct {
+	User
+	Password string `json:"password"`
+}
+
 type UserWithClaims struct {
 	User      User      `json:"user"`
 	SessionID uuid.UUID `json:"session_id"`
 	jwt.RegisteredClaims
 }
 
-type UserWithPassword struct {
-	User
-	Password string `json:"password"`
-}
-
 type UserWithAccounts struct {
 	User
 	Accounts []Account `json:"accounts"`
-}
-
-type UserResponse struct {
-	User *User `json:"user"`
 }
 
 type GetMeResponse struct {

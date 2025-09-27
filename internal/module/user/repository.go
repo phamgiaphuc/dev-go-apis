@@ -95,6 +95,22 @@ func (repo *UserRepository) GetUserWithPasswordByEmail(email string) (*models.Us
 	return userWithPasssword, nil
 }
 
+func (repo *UserRepository) GetUserPermissionsByRoleID(roleID int) ([]models.Permission, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	permissions := []models.Permission{}
+	if err := repo.DBClient.SelectContext(ctx, &permissions, `
+		SELECT p.*
+		FROM permissions p
+		LEFT JOIN role_permissions rp ON rp.permission_id = p.id AND rp.role_id = $1
+	`, roleID); err != nil {
+		return nil, err
+	}
+
+	return permissions, nil
+}
+
 func (repo *UserRepository) GetUserByID(id uuid.UUID) (*models.UserWithAccounts, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()

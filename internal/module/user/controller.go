@@ -13,6 +13,7 @@ import (
 
 type IUserService interface {
 	GetUserByID(id uuid.UUID) (*models.UserWithAccounts, error)
+	GetUserPermissionsByRoleID(roleID int) ([]models.Permission, error)
 }
 
 type UserController struct {
@@ -32,7 +33,14 @@ func NewUserController(service IUserService) *UserController {
 func (contl *UserController) RegisterRoutes(rg *gin.RouterGroup) {
 	userGroup := rg.Group("/users")
 	userGroup.GET("/:id", contl.GetUserById)
-	userGroup.GET("/me", middleware.AccessTokenHandler(), contl.GetMe)
+	userGroup.GET("/me",
+		middleware.AccessTokenHandler(),
+		middleware.PermissionHandler(
+			contl.Service,
+			lib.TempAdminDashboard,
+		),
+		contl.GetMe,
+	)
 }
 
 // Get user info godoc

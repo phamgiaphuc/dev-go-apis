@@ -12,16 +12,12 @@ func AccessTokenHandler() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		token := strings.Split(ctx.Request.Header.Get("Authorization"), " ")[1]
 		if token == "" {
-			ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
-				"error": "Unauthorized",
-			})
+			ctx.AbortWithError(http.StatusUnauthorized, lib.UnauthorizedError)
 			return
 		}
 		userWithClaims, err := lib.ParseToken(token, lib.ACCESS_TOKEN_SECRET)
 		if err != nil {
-			ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
-				"error": "Unauthorized",
-			})
+			ctx.AbortWithError(http.StatusUnauthorized, lib.UnauthorizedError)
 			return
 		}
 		ctx.Set("user", userWithClaims)
@@ -33,16 +29,12 @@ func RefreshTokenHandler() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		token, err := ctx.Request.Cookie("rt")
 		if err != nil {
-			ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
-				"error": "Unauthorized",
-			})
+			ctx.AbortWithError(http.StatusUnauthorized, lib.UnauthorizedError)
 			return
 		}
 		userWithClaims, err := lib.ParseToken(strings.Split(token.String(), "=")[1], lib.REFRESH_TOKEN_SECRET)
 		if err != nil {
-			ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
-				"error": "Unauthorized",
-			})
+			ctx.AbortWithError(http.StatusUnauthorized, lib.UnauthorizedError)
 			return
 		}
 		ctx.Set("user", userWithClaims)
