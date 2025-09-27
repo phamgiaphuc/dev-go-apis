@@ -1,6 +1,7 @@
 package user
 
 import (
+	"dev-go-apis/internal/middleware"
 	"dev-go-apis/internal/models"
 	"fmt"
 	"net/http"
@@ -30,6 +31,24 @@ func NewUserController(service IUserService) *UserController {
 func (contl *UserController) RegisterRoutes(rg *gin.RouterGroup) {
 	userGroup := rg.Group("/users")
 	userGroup.GET("/:id", contl.GetUserById)
+	userGroup.GET("/me", middleware.AccessTokenMiddleware(), contl.GetMe)
+}
+
+// Get user info godoc
+//
+//	@Summary	Get user info from token
+//	@Tags		User
+//	@Accept		json
+//	@Produce	json
+//	@Success	200	{object}	models.User
+//	@Router		/users/me [get]
+//
+//	@Security	Bearer
+func (contl *UserController) GetMe(ctx *gin.Context) {
+	userWithClaims := ctx.MustGet("user").(*models.UserWithClaims)
+	ctx.JSON(http.StatusOK, &models.UserResponse{
+		User: &userWithClaims.User,
+	})
 }
 
 // GetUserById godoc

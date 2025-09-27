@@ -39,3 +39,17 @@ func SignRefreshToken(payload *models.UserWithClaims) (string, error) {
 	tok := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return tok.SignedString([]byte(REFRESH_TOKEN_SECRET))
 }
+
+func ParseToken(token string, secret string) (*models.UserWithClaims, error) {
+	tok, err := jwt.ParseWithClaims(token, &models.UserWithClaims{}, func(t *jwt.Token) (interface{}, error) {
+		return []byte(secret), nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	claims, ok := tok.Claims.(*models.UserWithClaims)
+	if !ok || !tok.Valid {
+		return nil, err
+	}
+	return claims, nil
+}

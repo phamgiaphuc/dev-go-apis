@@ -13,6 +13,15 @@ definitions:
       updated_at:
         type: string
     type: object
+  models.CreatePermissionGroupRequest:
+    properties:
+      description:
+        type: string
+      name:
+        type: string
+    required:
+    - name
+    type: object
   models.LoginRequest:
     properties:
       email:
@@ -52,6 +61,22 @@ definitions:
       message:
         type: string
     type: object
+  models.UpdatePermissionGroupRequest:
+    properties:
+      description:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      permission_ids:
+        items:
+          type: integer
+        type: array
+    required:
+    - id
+    - name
+    type: object
   models.User:
     properties:
       created_at:
@@ -70,6 +95,8 @@ definitions:
         type: string
       role:
         type: string
+      role_id:
+        type: integer
       updated_at:
         type: string
     type: object
@@ -100,6 +127,8 @@ definitions:
         type: string
       role:
         type: string
+      role_id:
+        type: integer
       updated_at:
         type: string
     type: object
@@ -160,7 +189,48 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/models.Response'
-      summary: Get list of permissions
+      summary: Get list of permissions by group
+      tags:
+      - Permission
+  /permissions/group:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Create a permission group
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreatePermissionGroupRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Response'
+      summary: Create a new permission group
+      tags:
+      - Permission
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Update a permission group
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/models.UpdatePermissionGroupRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Response'
+      summary: Update an existing permission group
       tags:
       - Permission
   /roles:
@@ -193,6 +263,22 @@ paths:
           schema:
             $ref: '#/definitions/models.UserWithAccounts'
       summary: Get user by ID
+      tags:
+      - User
+  /users/me:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.User'
+      security:
+      - Bearer: []
+      summary: Get user info from token
       tags:
       - User
 securityDefinitions:

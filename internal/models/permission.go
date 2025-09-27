@@ -43,8 +43,8 @@ type Permission struct {
 }
 
 type PermissionGroup struct {
-	ID          int    `db:"id" json:"id"`
-	Name        string `db:"name" json:"name"`
+	ID          int    `db:"id" json:"id" binding:"required"`
+	Name        string `db:"name" json:"name" binding:"required"`
 	Description string `db:"description" json:"description"`
 }
 

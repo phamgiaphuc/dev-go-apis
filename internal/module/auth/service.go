@@ -23,6 +23,7 @@ func NewAuthService(userRepo IUserRepository) *AuthService {
 }
 
 func (s *AuthService) GenerateJwtTokens(userWithClaims *models.UserWithClaims) (*models.JwtTokens, error) {
+	fmt.Printf("Generating tokens for user: %+v\n", userWithClaims.User)
 	accessToken, err := lib.SignAccessToken(userWithClaims)
 	if err != nil {
 		return nil, fmt.Errorf("failed to generate access token: %s", err.Error())
@@ -44,8 +45,6 @@ func (s *AuthService) Login(body *models.LoginRequest) (*models.User, error) {
 	if err != nil {
 		return nil, fmt.Errorf("user not found")
 	}
-
-	fmt.Printf("User with password: %v\n", userWithPassword)
 
 	if err := lib.ComparePassword(userWithPassword.Password, body.Password); err != nil {
 		return nil, fmt.Errorf("invalid credentials")

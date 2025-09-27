@@ -14,7 +14,7 @@ type User struct {
 	EmailVerified bool      `db:"email_verified" json:"email_verified"`
 	Image         string    `db:"image" json:"image"`
 	IsBanned      bool      `db:"is_banned" json:"is_banned"`
-	RoleID        int       `db:"role_id" json:"-"`
+	RoleID        int       `db:"role_id" json:"role_id"`
 	CreatedAt     time.Time `db:"created_at" json:"created_at"`
 	UpdatedAt     time.Time `db:"updated_at" json:"updated_at"`
 
@@ -22,8 +22,8 @@ type User struct {
 }
 
 type UserWithClaims struct {
-	User
-	SessionID uuid.UUID
+	User      `json:"user"`
+	SessionID uuid.UUID `json:"session_id"`
 	jwt.RegisteredClaims
 }
 

@@ -89,7 +89,71 @@ const docTemplate = `{
                 "tags": [
                     "Permission"
                 ],
-                "summary": "Get list of permissions",
+                "summary": "Get list of permissions by group",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/permissions/group": {
+            "put": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Permission"
+                ],
+                "summary": "Update an existing permission group",
+                "parameters": [
+                    {
+                        "description": "Update a permission group",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.UpdatePermissionGroupRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Response"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Permission"
+                ],
+                "summary": "Create a new permission group",
+                "parameters": [
+                    {
+                        "description": "Create a permission group",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.CreatePermissionGroupRequest"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -114,6 +178,33 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/models.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/users/me": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Get user info from token",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.User"
                         }
                     }
                 }
@@ -168,6 +259,20 @@ const docTemplate = `{
                     "$ref": "#/definitions/models.Provider"
                 },
                 "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.CreatePermissionGroupRequest": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "name": {
                     "type": "string"
                 }
             }
@@ -230,6 +335,30 @@ const docTemplate = `{
                 }
             }
         },
+        "models.UpdatePermissionGroupRequest": {
+            "type": "object",
+            "required": [
+                "id",
+                "name"
+            ],
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "permission_ids": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                }
+            }
+        },
         "models.User": {
             "type": "object",
             "properties": {
@@ -256,6 +385,9 @@ const docTemplate = `{
                 },
                 "role": {
                     "type": "string"
+                },
+                "role_id": {
+                    "type": "integer"
                 },
                 "updated_at": {
                     "type": "string"
@@ -302,6 +434,9 @@ const docTemplate = `{
                 },
                 "role": {
                     "type": "string"
+                },
+                "role_id": {
+                    "type": "integer"
                 },
                 "updated_at": {
                     "type": "string"
