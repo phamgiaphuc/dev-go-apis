@@ -2,20 +2,20 @@
 -- +goose StatementBegin
 CREATE TABLE "permission_groups" (
   id SERIAL PRIMARY KEY,
-  name TEXT NOT NULL UNIQUE,
+  name VARCHAR(255) NOT NULL,
   description TEXT
 );
 
 CREATE TABLE "permissions" (
   id SERIAL PRIMARY KEY,
   group_id INT NOT NULL REFERENCES "permission_groups" (id) ON DELETE CASCADE,
-  name TEXT NOT NULL UNIQUE,
+  name VARCHAR(255) NOT NULL UNIQUE,
   description TEXT
 );
 
 CREATE TABLE "roles" (
   id SERIAL PRIMARY KEY,
-  name TEXT NOT NULL UNIQUE,
+  name VARCHAR(255) NOT NULL UNIQUE,
   description TEXT
 );
 

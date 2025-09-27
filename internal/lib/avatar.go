@@ -9,6 +9,9 @@ var (
 	AVATARS = []string{
 		"/static/avatars/ava1.png",
 		"/static/avatars/ava2.png",
+		"/static/avatars/ava3.png",
+		"/static/avatars/ava4.png",
+		"/static/avatars/ava5.png",
 	}
 )
 

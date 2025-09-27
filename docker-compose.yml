@@ -31,7 +31,7 @@ services:
       retries: 3
 
   api:
-    image: dev-go-apis:1.0.0
+    image: phamgiaphuc/dev-go-apis:1.0.0
     container_name: apis
     depends_on:
       postgres:
