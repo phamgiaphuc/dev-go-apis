@@ -1,0 +1,47 @@
+# Binaries
+/app
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+
+# Go build output
+*.out
+*.o
+*.a
+
+# Dependency directories
+vendor/
+
+# IDE/editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+logs/
+tmp/
+
+# Environment files
+.env
+.env.*
+!.env.example   # Keep a sample env file for reference
+
+# Docker
+*.pid
+*.seed
+docker-data/
+pgdata/
+redisdata/
+
+# Air / hot reload cache
+.air
+.air.toml.local
+
+# OS-specific
+.DS_Store
+Thumbs.db

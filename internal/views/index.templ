@@ -1,0 +1,17 @@
+package views
+
+import "dev-go-apis/internal/views/components"
+
+templ Index() {
+	<!DOCTYPE html>
+	<html lang="en">
+		@components.Header()
+		<body>
+			<main class="flex items-center justify-center min-h-dvh">
+				<a href="/docs/index.html">
+					<button class="text-white bg-blue-600 h-10 px-4 text-sm rounded-md hover:bg-blue-700 cursor-pointer">Go to Swagger Docs</button>
+				</a>
+			</main>
+		</body>
+	</html>
+}
