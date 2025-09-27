@@ -1,8 +1,10 @@
 # Dev Go APIs
 
-## Diagrams
+## Links and Diagrams
 
-- Databse Design: [Diagram Link](https://dbdiagram.io/d/Dev-Go-APIs-68d77773d2b621e42226cab2)
+- Swagger docs: Running on `localhost:{PORT}/docs` or `{domain}/docs`
+- Environment sample file: [File](./.env.example)
+- Databse design: [Diagram Link](https://dbdiagram.io/d/Dev-Go-APIs-68d77773d2b621e42226cab2)
 
 ## Commands
 

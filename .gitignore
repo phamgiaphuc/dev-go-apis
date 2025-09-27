@@ -28,8 +28,9 @@ tmp/
 
 # Environment files
 .env
-.env.*
-!.env.example   # Keep a sample env file for reference
+.env.docker
+.env.development
+.env.production
 
 # Docker
 *.pid
