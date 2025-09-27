@@ -23,7 +23,6 @@ func NewAuthService(userRepo IUserRepository) *AuthService {
 }
 
 func (s *AuthService) GenerateJwtTokens(userWithClaims *models.UserWithClaims) (*models.JwtTokens, error) {
-	fmt.Printf("Generating tokens for user: %+v\n", userWithClaims.User)
 	accessToken, err := lib.SignAccessToken(userWithClaims)
 	if err != nil {
 		return nil, fmt.Errorf("failed to generate access token: %s", err.Error())

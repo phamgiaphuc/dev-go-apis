@@ -1,6 +1,8 @@
 package models
 
-type Response struct {
+type APIResponse struct {
+	Success bool        `json:"success"`
+	Data    interface{} `json:"data,omitempty"`
 	Message string      `json:"message,omitempty"`
-	Data    interface{} `json:"data"`
+	Stack   string      `json:"stack,omitempty"`
 }

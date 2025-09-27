@@ -1,5 +1,15 @@
 basePath: /api
 definitions:
+  models.APIResponse:
+    properties:
+      data: {}
+      message:
+        type: string
+      stack:
+        type: string
+      success:
+        type: boolean
+    type: object
   models.Account:
     properties:
       account_id:
@@ -13,7 +23,7 @@ definitions:
       updated_at:
         type: string
     type: object
-  models.CreatePermissionGroupRequest:
+  models.CreateRoleRequest:
     properties:
       description:
         type: string
@@ -22,12 +32,27 @@ definitions:
     required:
     - name
     type: object
+  models.CreateRoleResponse:
+    properties:
+      role:
+        $ref: '#/definitions/models.Role'
+    type: object
+  models.GetMeResponse:
+    properties:
+      session_id:
+        type: string
+      user:
+        $ref: '#/definitions/models.User'
+    type: object
   models.LoginRequest:
     properties:
       email:
         type: string
       password:
         type: string
+    required:
+    - email
+    - password
     type: object
   models.LoginResponse:
     properties:
@@ -55,13 +80,12 @@ definitions:
       password:
         type: string
     type: object
-  models.Response:
+  models.RegisterResponse:
     properties:
-      data: {}
-      message:
-        type: string
+      user:
+        $ref: '#/definitions/models.User'
     type: object
-  models.UpdatePermissionGroupRequest:
+  models.Role:
     properties:
       description:
         type: string
@@ -69,13 +93,6 @@ definitions:
         type: integer
       name:
         type: string
-      permission_ids:
-        items:
-          type: integer
-        type: array
-    required:
-    - id
-    - name
     type: object
   models.User:
     properties:
@@ -99,11 +116,6 @@ definitions:
         type: integer
       updated_at:
         type: string
-    type: object
-  models.UserResponse:
-    properties:
-      user:
-        $ref: '#/definitions/models.User'
     type: object
   models.UserWithAccounts:
     properties:
@@ -155,7 +167,16 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.LoginResponse'
+            allOf:
+            - $ref: '#/definitions/models.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.LoginResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.APIResponse'
       summary: Login a user
       tags:
       - Auth
@@ -176,7 +197,16 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.UserResponse'
+            allOf:
+            - $ref: '#/definitions/models.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.RegisterResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.APIResponse'
       summary: Register a new user
       tags:
       - Auth
@@ -188,49 +218,8 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.Response'
+            $ref: '#/definitions/models.APIResponse'
       summary: Get list of permissions by group
-      tags:
-      - Permission
-  /permissions/group:
-    post:
-      consumes:
-      - application/json
-      parameters:
-      - description: Create a permission group
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/models.CreatePermissionGroupRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.Response'
-      summary: Create a new permission group
-      tags:
-      - Permission
-    put:
-      consumes:
-      - application/json
-      parameters:
-      - description: Update a permission group
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/models.UpdatePermissionGroupRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.Response'
-      summary: Update an existing permission group
       tags:
       - Permission
   /roles:
@@ -241,8 +230,41 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.Response'
+            $ref: '#/definitions/models.APIResponse'
       summary: Get list of roles
+      tags:
+      - Role
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Role creation request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateRoleRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.CreateRoleResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+      summary: Create a new role
       tags:
       - Role
   /users/{id}:
@@ -261,7 +283,12 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.UserWithAccounts'
+            allOf:
+            - $ref: '#/definitions/models.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.UserWithAccounts'
+              type: object
       summary: Get user by ID
       tags:
       - User
@@ -275,7 +302,12 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.User'
+            allOf:
+            - $ref: '#/definitions/models.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.GetMeResponse'
+              type: object
       security:
       - Bearer: []
       summary: Get user info from token

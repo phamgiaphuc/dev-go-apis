@@ -22,7 +22,7 @@ type User struct {
 }
 
 type UserWithClaims struct {
-	User      `json:"user"`
+	User      User      `json:"user"`
 	SessionID uuid.UUID `json:"session_id"`
 	jwt.RegisteredClaims
 }
@@ -39,4 +39,9 @@ type UserWithAccounts struct {
 
 type UserResponse struct {
 	User *User `json:"user"`
+}
+
+type GetMeResponse struct {
+	User      User      `json:"user"`
+	SessionID uuid.UUID `json:"session_id"`
 }

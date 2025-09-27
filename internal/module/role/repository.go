@@ -18,6 +18,21 @@ func NewRoleRepository(dbClient *sqlx.DB) *RoleRepository {
 	}
 }
 
+func (repo *RoleRepository) CreateRole(role *models.Role) (*models.Role, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	if err := repo.DBClient.GetContext(ctx, role, `
+		INSERT INTO "roles" (name, description)
+		VALUES ($1, $2)
+		RETURNING *;
+	`, role.Name, role.Description); err != nil {
+		return nil, err
+	}
+
+	return role, nil
+}
+
 func (repo *RoleRepository) GetRoleList() ([]models.RoleList, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()

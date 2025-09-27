@@ -8,7 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func AccessTokenMiddleware() gin.HandlerFunc {
+func AccessTokenHandler() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		token := strings.Split(ctx.Request.Header.Get("Authorization"), " ")[1]
 		if token == "" {
@@ -29,7 +29,7 @@ func AccessTokenMiddleware() gin.HandlerFunc {
 	}
 }
 
-func RefreshTokenMiddleware() gin.HandlerFunc {
+func RefreshTokenHandler() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		token, err := ctx.Request.Cookie("rt")
 		if err != nil {

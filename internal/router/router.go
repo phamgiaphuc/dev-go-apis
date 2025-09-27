@@ -2,6 +2,7 @@ package router
 
 import (
 	"dev-go-apis/internal/lib"
+	"dev-go-apis/internal/middleware"
 	"dev-go-apis/internal/module/auth"
 	"dev-go-apis/internal/module/permission"
 	"dev-go-apis/internal/module/role"
@@ -30,6 +31,9 @@ type Router struct {
 func NewRouter(dbClient *sqlx.DB, cacheClient *redis.Client) *Router {
 	gin.SetMode(lib.GIN_MODE)
 	router := gin.Default()
+
+	router.Use(middleware.RecoveryMiddleware())
+	router.Use(middleware.ErrorsHandler())
 
 	return &Router{
 		DBClient:    dbClient,
@@ -81,9 +85,7 @@ func (r *Router) InitRoutes() http.Handler {
 	}
 
 	r.Router.NoRoute(func(ctx *gin.Context) {
-		ctx.JSON(http.StatusNotFound, gin.H{
-			"error": "The resource you are looking for is not found",
-		})
+		lib.SendErrorResponse(ctx, lib.ResourceNotFoundError)
 	})
 
 	return r.Router.Handler()

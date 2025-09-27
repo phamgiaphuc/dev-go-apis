@@ -3,7 +3,6 @@ package auth
 import (
 	"dev-go-apis/internal/lib"
 	"dev-go-apis/internal/models"
-	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
@@ -34,7 +33,6 @@ func (contl *AuthController) RegisterRoutes(rg *gin.RouterGroup) {
 	authGroup := rg.Group("/auth")
 	authGroup.POST("/register", contl.Register)
 	authGroup.POST("/login", contl.Login)
-	authGroup.POST("/logout", contl.Logout)
 }
 
 // Register godoc
@@ -44,25 +42,24 @@ func (contl *AuthController) RegisterRoutes(rg *gin.RouterGroup) {
 //	@Accept		json
 //	@Produce	json
 //	@Param		body	body		models.RegisterRequest	true	"Register request"
-//	@Success	200		{object}	models.UserResponse
+//	@Success	200		{object}	models.APIResponse{data=models.RegisterResponse}
+//	@Failure	400		{object}	models.APIResponse
 //	@Router		/auth/register [post]
 func (contl *AuthController) Register(ctx *gin.Context) {
 	var req models.RegisterRequest
 
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		ctx.Error(lib.InvalidBodyRequestError.WithStack(err.Error()))
 		return
 	}
 
 	user, err := contl.AuthService.Register(&req)
 	if err != nil {
-		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
-		})
+		ctx.Error(lib.InternalServerError.WithStack(err.Error()))
 		return
 	}
 
-	ctx.JSON(http.StatusOK, &models.UserResponse{User: user})
+	lib.SendSucceedResponse(ctx, &models.RegisterResponse{User: user})
 }
 
 // Login godoc
@@ -72,21 +69,20 @@ func (contl *AuthController) Register(ctx *gin.Context) {
 //	@Accept		json
 //	@Produce	json
 //	@Param		body	body		models.LoginRequest	true	"Login request"
-//	@Success	200		{object}	models.LoginResponse
+//	@Success	200		{object}	models.APIResponse{data=models.LoginResponse}
+//	@Failure	400		{object}	models.APIResponse
 //	@Router		/auth/login [post]
 func (contl *AuthController) Login(ctx *gin.Context) {
 	var req models.LoginRequest
 
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		ctx.Error(lib.InvalidBodyRequestError.WithStack(err.Error()))
 		return
 	}
 
 	user, err := contl.AuthService.Login(&req)
 	if err != nil {
-		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
-		})
+		ctx.Error(lib.InternalServerError.WithStack(err.Error()))
 		return
 	}
 
@@ -98,9 +94,7 @@ func (contl *AuthController) Login(ctx *gin.Context) {
 	}
 	session, err = contl.SessionService.CreateSession(session)
 	if err != nil {
-		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
-		})
+		ctx.Error(lib.InternalServerError.WithStack(err.Error()))
 		return
 	}
 
@@ -109,14 +103,10 @@ func (contl *AuthController) Login(ctx *gin.Context) {
 		SessionID: session.ID,
 	})
 	if err != nil {
-		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
-		})
+		ctx.Error(lib.InternalServerError.WithStack(err.Error()))
 		return
 	}
 
 	ctx.SetCookie("rt", tokens.RefreshToken, int(lib.REFRESH_TOKEN_TTL_DURATION), "/", "", true, true)
-	ctx.JSON(http.StatusOK, &models.LoginResponse{User: user, AccessToken: tokens.AccessToken})
+	lib.SendSucceedResponse(ctx, &models.LoginResponse{User: user, AccessToken: tokens.AccessToken})
 }
-
-func (contl *AuthController) Logout(ctx *gin.Context) {}

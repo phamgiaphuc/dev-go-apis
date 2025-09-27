@@ -18,21 +18,6 @@ func NewPermissionRepository(dbClient *sqlx.DB) *PermissionRepository {
 	}
 }
 
-func (repo *PermissionRepository) CreatePermissionGroup(permissionGroup *models.PermissionGroup) (*models.PermissionGroup, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
-	defer cancel()
-
-	if err := repo.DBClient.GetContext(ctx, permissionGroup, `
-		INSERT INTO permission_groups (name, description)
-		VALUES ($1, $2)
-		RETURNING id, name, description;
-	`, permissionGroup.Name, permissionGroup.Description); err != nil {
-		return nil, err
-	}
-
-	return permissionGroup, nil
-}
-
 func (repo *PermissionRepository) GetPermissionList() ([]models.PermissionList, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
