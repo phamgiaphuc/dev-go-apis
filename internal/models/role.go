@@ -1,14 +1,23 @@
 package models
 
 type Role struct {
-	ID          int     `db:"id" json:"id"`
+	ID          int     `db:"id" json:"id" binding:"required"`
 	Name        string  `db:"name" json:"name"`
 	Description *string `db:"description" json:"description"`
 }
 
-type RoleList struct {
+type RoleIDs []int
+
+type RolePermissions struct {
 	Role
-	Permissions Permissions `db:"permissions" json:"permissions"`
+	Permissions   Permissions   `db:"permissions" json:"-"`
+	PermissionIDs PermissionIDs `json:"permission_ids"`
+}
+
+type RolePermissionsList []RolePermissions
+
+type GetRolePermissionsByIdRequest struct {
+	ID int `uri:"id" binding:"required"`
 }
 
 type CreateRoleRequest struct {
@@ -16,10 +25,10 @@ type CreateRoleRequest struct {
 	Description *string `db:"description" json:"description"`
 }
 
-type GetRoleListResponse struct {
-	Roles []RoleList `json:"roles"`
+type UpdateRolePermissionsRequest struct {
+	RolePermissions `json:",inline"`
 }
 
-type CreateRoleResponse struct {
-	Role *Role `json:"role"`
+type DeleteRolePermissionsRequest struct {
+	RoleIDs `json:"role_ids" binding:"required"`
 }

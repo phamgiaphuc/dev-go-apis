@@ -7,9 +7,9 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: main
     ports:
-      - "5438:5432"
+      - "8002:5432"
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - pg-data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d main"]
       interval: 5s
@@ -21,9 +21,9 @@ services:
     container_name: redis_db
     command: ["redis-server", "--requirepass", "redis123"]
     ports:
-      - "6389:6379"
+      - "8003:6379"
     volumes:
-      - redisdata:/data
+      - redis-data:/data
     healthcheck:
       test: ["CMD", "redis-cli", "-a", "redis123", "ping"]
       interval: 5s
@@ -49,8 +49,33 @@ services:
       REFRESH_TOKEN_TTL: ${REFRESH_TOKEN_TTL}
       MIGRATION_MODE: ${MIGRATION_MODE}
     ports:
-      - ${PORT}:${PORT}
+      - ${PORT:-8001}:${PORT:-8001}
+  dbgate:
+    image: dbgate/dbgate:alpine
+    container_name: dbgate
+    ports:
+      - "8004:3000"
+    volumes:
+      - dbgate-data:/root/.dbgate
+    environment:
+      CONNECTIONS: con1,con2
+
+      LABEL_con1: postgres_db
+      SERVER_con1: postgres
+      USER_con1: postgres
+      PASSWORD_con1: postgres
+      PORT_con1: 5432
+      ENGINE_con1: postgres@dbgate-plugin-postgres
+
+      LABEL_con2: redis_db
+      URL_con2: redis://default:redis123@redis:6379/0
+      ENGINE_con2: redis@dbgate-plugin-redis
 
 volumes:
-  pgdata:
-  redisdata:
+  pg-data:
+  redis-data:
+  dbgate-data:
+
+networks:
+  default:
+    driver: bridge

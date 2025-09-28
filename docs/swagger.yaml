@@ -32,10 +32,14 @@ definitions:
     required:
     - name
     type: object
-  models.CreateRoleResponse:
+  models.DeleteRolePermissionsRequest:
     properties:
-      role:
-        $ref: '#/definitions/models.Role'
+      role_ids:
+        items:
+          type: integer
+        type: array
+    required:
+    - role_ids
     type: object
   models.GetMeResponse:
     properties:
@@ -93,6 +97,38 @@ definitions:
         type: integer
       name:
         type: string
+    required:
+    - id
+    type: object
+  models.RolePermissions:
+    properties:
+      description:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      permission_ids:
+        items:
+          type: integer
+        type: array
+    required:
+    - id
+    type: object
+  models.UpdateRolePermissionsRequest:
+    properties:
+      description:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      permission_ids:
+        items:
+          type: integer
+        type: array
+    required:
+    - id
     type: object
   models.User:
     properties:
@@ -223,12 +259,56 @@ paths:
       tags:
       - Permission
   /roles:
+    delete:
+      consumes:
+      - application/json
+      description: Remove roles
+      parameters:
+      - description: Delete roles request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/models.DeleteRolePermissionsRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+      summary: Delete roles
+      tags:
+      - Role
     get:
       produces:
       - application/json
       responses:
         "200":
           description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.APIResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/models.RolePermissions'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+        "500":
+          description: Internal Server Error
           schema:
             $ref: '#/definitions/models.APIResponse'
       summary: Get list of roles
@@ -254,7 +334,7 @@ paths:
             - $ref: '#/definitions/models.APIResponse'
             - properties:
                 data:
-                  $ref: '#/definitions/models.CreateRoleResponse'
+                  $ref: '#/definitions/models.Role'
               type: object
         "400":
           description: Bad Request
@@ -265,6 +345,72 @@ paths:
           schema:
             $ref: '#/definitions/models.APIResponse'
       summary: Create a new role
+      tags:
+      - Role
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Role update request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/models.UpdateRolePermissionsRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.RolePermissions'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+      summary: Update a role
+      tags:
+      - Role
+  /roles/{id}:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: Role ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.RolePermissions'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+      summary: Get role by ID
       tags:
       - Role
   /users/{id}:

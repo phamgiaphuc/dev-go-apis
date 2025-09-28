@@ -3,6 +3,7 @@ package auth
 import (
 	"dev-go-apis/internal/lib"
 	"dev-go-apis/internal/models"
+	"log"
 
 	"github.com/gin-gonic/gin"
 )
@@ -49,6 +50,7 @@ func (contl *AuthController) Register(ctx *gin.Context) {
 	var req models.RegisterRequest
 
 	if err := ctx.ShouldBindJSON(&req); err != nil {
+		log.Printf("Binding failed: %v\n", err)
 		ctx.Error(lib.InvalidBodyRequestError.WithStack(err.Error()))
 		return
 	}

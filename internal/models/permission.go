@@ -13,6 +13,8 @@ type Permission struct {
 	GroupID     int    `db:"group_id" json:"-"`
 }
 
+type PermissionIDs []int
+
 type PermissionGroup struct {
 	ID          int    `db:"id" json:"id" binding:"required"`
 	Name        string `db:"name" json:"name" binding:"required"`
