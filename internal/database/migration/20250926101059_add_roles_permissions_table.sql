@@ -25,7 +25,6 @@ CREATE TABLE "role_permissions" (
   PRIMARY KEY (role_id, permission_id)
 );
 
--- Insert data
 INSERT INTO "permission_groups" (name, description)
 VALUES 
   ('dashboard:group', 'Permissions related to admin dashboard')
@@ -72,7 +71,6 @@ JOIN "permissions" p ON p.name IN (
 WHERE r.name = 'admin'
 ON CONFLICT (role_id, permission_id) DO NOTHING;
 
--- Functions
 CREATE OR REPLACE FUNCTION prevent_protected_roles_delete()
 RETURNS trigger AS $$
 BEGIN
@@ -93,7 +91,6 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- Triggers
 CREATE TRIGGER trg_prevent_roles_delete
 BEFORE DELETE ON roles
 FOR EACH ROW
@@ -104,7 +101,6 @@ BEFORE UPDATE ON roles
 FOR EACH ROW
 EXECUTE FUNCTION prevent_protected_roles_update();
 
--- Add column "role_id" and update data in table "users"
 ALTER TABLE "users" 
 ADD COLUMN IF NOT EXISTS role_id INT REFERENCES "roles" (id);
 
@@ -133,7 +129,6 @@ DROP TABLE IF EXISTS "permissions";
 DROP TABLE IF EXISTS "roles";
 DROP TABLE IF EXISTS "permission_groups";
 
--- Cleanup sequences to fully reset SERIALs
 DROP SEQUENCE IF EXISTS "permission_groups_id_seq";
 DROP SEQUENCE IF EXISTS "permissions_id_seq";
 DROP SEQUENCE IF EXISTS "roles_id_seq";

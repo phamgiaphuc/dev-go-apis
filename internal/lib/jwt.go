@@ -8,7 +8,7 @@ import (
 )
 
 var (
-	ACCESS_TOKEN_TTL_DURATION  = ParseTimeDuration(ACCESS_TOKEN_TTL, 7, time.Hour*24)
+	ACCESS_TOKEN_TTL_DURATION  = ParseTimeDuration(ACCESS_TOKEN_TTL, 15, time.Minute)
 	REFRESH_TOKEN_TTL_DURATION = ParseTimeDuration(REFRESH_TOKEN_TTL, 7, time.Hour*24)
 )
 

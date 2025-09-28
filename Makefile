@@ -1,5 +1,8 @@
 include .env
 
+GOOSE_MIGRATION_DIR ?= ./internal/database/migration
+
+
 dev: # Run development
 	@air -c .air.toml
 swag: # Swagger Docs
