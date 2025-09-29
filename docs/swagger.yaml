@@ -83,11 +83,33 @@ definitions:
         type: string
       password:
         type: string
+    required:
+    - email
+    - name
+    - password
     type: object
   models.RegisterResponse:
     properties:
-      user:
-        $ref: '#/definitions/models.User'
+      created_at:
+        type: string
+      email:
+        type: string
+      email_verified:
+        type: boolean
+      id:
+        type: string
+      image:
+        type: string
+      is_banned:
+        type: boolean
+      name:
+        type: string
+      role:
+        type: string
+      role_id:
+        type: integer
+      updated_at:
+        type: string
     type: object
   models.Role:
     properties:
@@ -285,6 +307,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.APIResponse'
+      security:
+      - Bearer: []
       summary: Delete roles
       tags:
       - Role
@@ -311,6 +335,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.APIResponse'
+      security:
+      - Bearer: []
       summary: Get list of roles
       tags:
       - Role
@@ -344,6 +370,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.APIResponse'
+      security:
+      - Bearer: []
       summary: Create a new role
       tags:
       - Role
@@ -377,6 +405,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.APIResponse'
+      security:
+      - Bearer: []
       summary: Update a role
       tags:
       - Role
@@ -410,6 +440,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.APIResponse'
+      security:
+      - Bearer: []
       summary: Get role by ID
       tags:
       - Role

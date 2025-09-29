@@ -44,6 +44,7 @@ func NewRouter(dbClient *sqlx.DB, cacheClient *redis.Client) *Router {
 
 func (r *Router) InitRoutes() http.Handler {
 	r.Router.Static("/static", "internal/static/")
+	r.Router.StaticFile("/styles.css", "internal/views/styles.css")
 	r.Router.StaticFile("/favicon.ico", "internal/static/favicon.ico")
 
 	r.Router.GET("/", func(ctx *gin.Context) {

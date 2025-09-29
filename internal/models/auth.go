@@ -22,5 +22,5 @@ type LoginResponse struct {
 }
 
 type RegisterResponse struct {
-	User User `json:"user"`
+	User `json:",inline"`
 }
