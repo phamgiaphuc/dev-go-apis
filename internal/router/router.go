@@ -53,6 +53,11 @@ func (r *Router) InitRoutes() http.Handler {
 
 	r.Router.GET("/docs/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 
+	/**
+	 * Middlewares
+	 */
+	r.Router.Use(middleware.ApiKeyHandler())
+
 	apiGroup := r.Router.Group("/api")
 
 	/**

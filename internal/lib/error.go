@@ -12,6 +12,7 @@ var (
 	ResourceNotFoundError    = &models.APIError{Code: http.StatusNotFound, Message: "Resource not found"}
 	ResourceForbiddenError   = &models.APIError{Code: http.StatusForbidden, Message: "Resource forbidden"}
 	UnauthorizedError        = &models.APIError{Code: http.StatusUnauthorized, Message: "Unauthorized"}
+	MissingAPIKeyError       = &models.APIError{Code: http.StatusUnauthorized, Message: "Missing api key"}
 )
 
 func NewAPIError(code int, message, stack string) *models.APIError {

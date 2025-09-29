@@ -22,5 +22,5 @@ func SendErrorResponse(ctx *gin.Context, err *models.APIError) {
 	if GIN_MODE != gin.ReleaseMode {
 		resp.Stack = err.GetStack()
 	}
-	ctx.JSON(err.Code, resp)
+	ctx.AbortWithStatusJSON(err.Code, resp)
 }

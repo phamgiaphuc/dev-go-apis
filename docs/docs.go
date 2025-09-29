@@ -457,6 +457,11 @@ const docTemplate = `{
         },
         "/users/{id}": {
             "get": {
+                "security": [
+                    {
+                        "ApiKey": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -808,6 +813,11 @@ const docTemplate = `{
         }
     },
     "securityDefinitions": {
+        "ApiKey": {
+            "type": "apiKey",
+            "name": "api_key",
+            "in": "header"
+        },
         "Bearer": {
             "description": "Type \"Bearer\" followed by a space and JWT token.",
             "type": "apiKey",

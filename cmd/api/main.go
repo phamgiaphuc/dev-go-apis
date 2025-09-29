@@ -37,10 +37,14 @@ func gracefulShutdown(server *http.Server, done chan bool) {
 //	@host		localhost:8000
 //	@BasePath	/api
 
-// @securityDefinitions.apikey	Bearer
+//	@securityDefinitions.apikey	Bearer
+//	@in							header
+//	@name						Authorization
+//	@description				Type "Bearer" followed by a space and JWT token.
+
+// @securityDefinitions.apikey	ApiKey
 // @in							header
-// @name						Authorization
-// @description				Type "Bearer" followed by a space and JWT token.
+// @name						api_key
 func main() {
 	if lib.MIGRATION_MODE == 1 {
 		database.MigrateDB()

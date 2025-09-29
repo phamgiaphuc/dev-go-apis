@@ -37,6 +37,7 @@
 | `PORT`                 | Server's port                | `Development`, `Docker` | Ex: `8000`                                                                                                                                                | 8000                                                                                 |
 | `SERVER_URL`           | Server's url                 | `Development`, `Docker` | Ex: `http://localhost:8000`                                                                                                                               | http://localhost:8000                                                                |
 | `MIGRATION_MODE`       | Run database's migrations    | `Docker`                | `0` for `off`, `1` for `on`                                                                                                                               | 0                                                                                    |
+| `API_KEY`              | Key for accessing the apis   | `Development`, `Docker` | -                                                                                                                                                         | @secret123                                                                           |
 | `ACCESS_TOKEN_SECRET`  | Access token's secret        | `Development`, `Docker` | -                                                                                                                                                         | @scecret123                                                                          |
 | `REFRESH_TOKEN_SECRET` | Refresh token's secret       | `Development`, `Docker` | -                                                                                                                                                         | @scecret123                                                                          |
 | `ACCESS_TOKEN_TTL`     | Access token's time to live  | `Development`, `Docker` | - Default valid time units: `ns, us (or µs), ms, s, m, h` and alternative time units: `d` for `day`, `w` for `week`, `mth` for `month` and `y` for `year` | 15m (15 minutes)                                                                     |
@@ -67,17 +68,95 @@
 | `DBGATE_USER`     | DBGate web user     | admin         |
 | `DBGATE_PASSWORD` | DBGate web password | admin123      |
 
-## Features checklist
+## Docker deployment:
 
-- **Auth**:
+```
+services:
+  postgres:
+    image: bitnami/postgresql:17.6.0
+    container_name: postgres_db
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-main}
+    ports:
+      - ${POSTGRES_PORT:-8002}:5432
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d main"]
+      interval: 5s
+      timeout: 3s
+      retries: 3
 
-  - [x] Log in
-  - [x] Register
+  redis:
+    image: redis:alpine3.20
+    container_name: redis_db
+    command: ["redis-server", "--requirepass", "$$REDIS_PASSWORD"]
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-redis123}
+    ports:
+      - ${REDIS_PORT:-8003}:6379
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "$$REDIS_PASSWORD", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 3
 
-- **Role**:
+  api:
+    image: phamgiaphuc/dev-go-apis:1.0.0
+    container_name: apis
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      REDIS_URL: ${REDIS_URL}
+      PORT: ${PORT}
+      SERVER_URL: ${SERVER_URL}
+      API_KEY: ${API_KEY}
+      ACCESS_TOKEN_SECRET: ${ACCESS_TOKEN_SECRET}
+      REFRESH_TOKEN_SECRET: ${REFRESH_TOKEN_SECRET}
+      ACCESS_TOKEN_TTL: ${ACCESS_TOKEN_TTL}
+      REFRESH_TOKEN_TTL: ${REFRESH_TOKEN_TTL}
+      MIGRATION_MODE: ${MIGRATION_MODE}
+    ports:
+      - ${PORT:-8001}:${PORT:-8001}
+  dbgate:
+    image: dbgate/dbgate:alpine
+    container_name: dbgate
+    ports:
+      - "8004:3000"
+    volumes:
+      - dbgate-data:/root/.dbgate
+    environment:
+      LOGIN: ${DBGATE_USER}
+      PASSWORD: ${DBGATE_PASSWORD}
 
-  - [x] Get a role list
-  - [x] Create a role
-  - [x] Update a role with assigning permissions to that role
-  - [x] Get a role
-  - [x] Delete a role
+      CONNECTIONS: con1,con2
+
+      LABEL_con1: postgres_db
+      SERVER_con1: postgres
+      USER_con1: postgres
+      PASSWORD_con1: postgres
+      PORT_con1: 5432
+      ENGINE_con1: postgres@dbgate-plugin-postgres
+
+      LABEL_con2: redis_db
+      URL_con2: redis://default:redis123@redis:6379/0
+      ENGINE_con2: redis@dbgate-plugin-redis
+
+volumes:
+  pg-data:
+  redis-data:
+  dbgate-data:
+
+networks:
+  default:
+    driver: bridge
+
+```

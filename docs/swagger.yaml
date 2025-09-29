@@ -467,6 +467,8 @@ paths:
                 data:
                   $ref: '#/definitions/models.UserWithAccounts'
               type: object
+      security:
+      - ApiKey: []
       summary: Get user by ID
       tags:
       - User
@@ -492,6 +494,10 @@ paths:
       tags:
       - User
 securityDefinitions:
+  ApiKey:
+    in: header
+    name: api_key
+    type: apiKey
   Bearer:
     description: Type "Bearer" followed by a space and JWT token.
     in: header

@@ -10,6 +10,7 @@ var (
 	PORT       = GetEnvInt("PORT", 8000)
 	SERVER_URL = GetEnvString("SERVER_URL", "http://localhost:8000")
 	CLIENT_URL = GetEnvString("CLIENT_URL", "http://localhost:3000")
+	API_KEY    = GetEnvString("API_KEY", "@secret123")
 
 	// Database
 	MIGRATION_MODE = GetEnvInt("MIGRATION_MODE", 0)
