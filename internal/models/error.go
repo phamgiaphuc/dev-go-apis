@@ -14,10 +14,6 @@ func (e *APIError) GetStack() string {
 	return e.Stack
 }
 
-func (e *APIError) SetStack(stack string) {
-	e.Stack = stack
-}
-
 func (e *APIError) WithStack(stack string) *APIError {
 	e.Stack = stack
 	return e

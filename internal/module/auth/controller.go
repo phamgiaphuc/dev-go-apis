@@ -61,7 +61,7 @@ func (contl *AuthController) Register(ctx *gin.Context) {
 		return
 	}
 
-	lib.SendSucceedResponse(ctx, &models.RegisterResponse{User: user})
+	lib.SendSucceedResponse(ctx, &models.RegisterResponse{User: *user})
 }
 
 // Login godoc
@@ -110,5 +110,5 @@ func (contl *AuthController) Login(ctx *gin.Context) {
 	}
 
 	ctx.SetCookie("rt", tokens.RefreshToken, int(lib.REFRESH_TOKEN_TTL_DURATION), "/", "", true, true)
-	lib.SendSucceedResponse(ctx, &models.LoginResponse{User: user, AccessToken: tokens.AccessToken})
+	lib.SendSucceedResponse(ctx, &models.LoginResponse{User: *user, AccessToken: tokens.AccessToken})
 }

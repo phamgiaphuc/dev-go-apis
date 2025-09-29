@@ -1,20 +1,33 @@
 # Dev Go APIs
 
-## Links and Diagrams
+## Table of Contents
+
+- [Links and Diagrams](#links-and-diagrams-)
+- [Commands](#commands-)
+- [Environments](#environments-)
+
+## Links and Diagrams 📈
 
 - Swagger docs: Running on `localhost:{PORT}/docs` or `{domain}/docs`
-- Environment sample file: [File](./.env.example)
+- Environment sample file (.env.example): [File](./.env.example)
 - Databse design: [Diagram link](https://dbdiagram.io/d/Dev-Go-APIs-68d77773d2b621e42226cab2)
 
-## Commands
+## Commands 💻
 
+- Make commands:
+  - `make dev`: Run development
+  - `make swag`: Generate Swagger docs
+  - `make goose-up`: DB migration up
+  - `make goose-down`: DB migration down
+  - `make goose-down-to name=<version>`: DB migration down to a specific version
+  - `make goose-create`: Create a migration sql file
 - Goose commands:
   `goose -dir ./internal/database/migration create add_extensions sql`
 - Docker commands:
   `docker build -t phamgiaphuc/dev-go-apis:<version> .`
   `docker compose --env-file .env.docker up -d`
 
-## Environments
+## Environments 🔐
 
 - **Server variables**:
 
@@ -52,3 +65,18 @@
 | ----------------- | ------------------- | ------------- |
 | `DBGATE_USER`     | DBGate web user     | admin         |
 | `DBGATE_PASSWORD` | DBGate web password | admin123      |
+
+## Features checklist
+
+- **Auth**:
+
+  - [ ] Log in
+  - [ ] Register
+
+- **Role**:
+
+  - [ ] Get a role list
+  - [ ] Create a role
+  - [ ] Update a role with assigning permissions to that role
+  - [ ] Get a role
+  - [ ] Delete a role
