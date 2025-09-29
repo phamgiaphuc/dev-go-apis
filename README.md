@@ -70,13 +70,13 @@
 
 - **Auth**:
 
-  - [ ] Log in
-  - [ ] Register
+  - [x] Log in
+  - [x] Register
 
 - **Role**:
 
-  - [ ] Get a role list
-  - [ ] Create a role
-  - [ ] Update a role with assigning permissions to that role
-  - [ ] Get a role
-  - [ ] Delete a role
+  - [x] Get a role list
+  - [x] Create a role
+  - [x] Update a role with assigning permissions to that role
+  - [x] Get a role
+  - [x] Delete a role
