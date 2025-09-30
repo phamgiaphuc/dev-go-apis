@@ -7,6 +7,7 @@ import (
 
 type ICacheRepository interface {
 	SetValue(string, interface{}, time.Duration) error
+	GetValue(string) (string, error)
 }
 
 type CacheService struct {
@@ -25,4 +26,8 @@ func (s *CacheService) SetValue(key string, value interface{}, expiration time.D
 		return fmt.Errorf("failed to set value: %s", err.Error())
 	}
 	return nil
+}
+
+func (s *CacheService) GetValue(key string) (string, error) {
+	return s.CacheRepo.GetValue(key)
 }

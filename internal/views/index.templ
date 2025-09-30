@@ -8,36 +8,9 @@ templ Index() {
 	<html lang="en" class="scroll-smooth">
 		@components.Header()
 		<body>
-			<main class="p-4 min-h-dvh flex flex-col gap-6">
-				<div class="px-4 flex items-center justify-between">
-					<div class="flex items-center gap-2">
-						<label class="text-2xl font-bold">Dev Go APIs</label>
-						<span class="bg-blue-600 px-3 text-xs text-white rounded-full py-0.5 font-medium">v1.0.0</span>
-					</div>
-					<div class="flex items-center gap-8">
-						<a href="#features" class="text-blue-600 hover:underline underline-offset-2 transition-all duration-300 flex items-center gap-2">
-							Features checklist
-						</a>
-						<a href="#db-design" class="text-blue-600 hover:underline underline-offset-2 transition-all duration-300 flex items-center gap-2">
-							Database design
-						</a>
-						<a target="_blank" href="/docs/index.html" class="text-blue-600 hover:underline underline-offset-2 transition-all duration-300 flex items-center gap-2">
-							APIs document
-							<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-box-arrow-up-right" viewBox="0 0 16 16">
-								<path fill-rule="evenodd" d="M8.636 3.5a.5.5 0 0 0-.5-.5H1.5A1.5 1.5 0 0 0 0 4.5v10A1.5 1.5 0 0 0 1.5 16h10a1.5 1.5 0 0 0 1.5-1.5V7.864a.5.5 0 0 0-1 0V14.5a.5.5 0 0 1-.5.5h-10a.5.5 0 0 1-.5-.5v-10a.5.5 0 0 1 .5-.5h6.636a.5.5 0 0 0 .5-.5"></path>
-								<path fill-rule="evenodd" d="M16 .5a.5.5 0 0 0-.5-.5h-5a.5.5 0 0 0 0 1h3.793L6.146 9.146a.5.5 0 1 0 .708.708L15 1.707V5.5a.5.5 0 0 0 1 0z"></path>
-							</svg>
-						</a>
-						<a target="_blank" href="https://github.com/acusdev/dev-go-apis" class="text-blue-600 hover:underline underline-offset-2 transition-all duration-300 flex items-center gap-2">
-							Repository
-							<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-box-arrow-up-right" viewBox="0 0 16 16">
-								<path fill-rule="evenodd" d="M8.636 3.5a.5.5 0 0 0-.5-.5H1.5A1.5 1.5 0 0 0 0 4.5v10A1.5 1.5 0 0 0 1.5 16h10a1.5 1.5 0 0 0 1.5-1.5V7.864a.5.5 0 0 0-1 0V14.5a.5.5 0 0 1-.5.5h-10a.5.5 0 0 1-.5-.5v-10a.5.5 0 0 1 .5-.5h6.636a.5.5 0 0 0 .5-.5"></path>
-								<path fill-rule="evenodd" d="M16 .5a.5.5 0 0 0-.5-.5h-5a.5.5 0 0 0 0 1h3.793L6.146 9.146a.5.5 0 1 0 .708.708L15 1.707V5.5a.5.5 0 0 0 1 0z"></path>
-							</svg>
-						</a>
-					</div>
-				</div>
-				<div id="features" class="flex flex-col gap-4 px-4">
+			<main class="min-h-dvh flex flex-col relative mb-4">
+				@components.Navbar()
+				<div id="features" class="flex flex-col gap-4 px-8 mt-4 scroll-mt-20">
 					<div class="flex items-center">
 						<label class="text-lg font-semibold">Features checklist</label>
 						<div class="flex gap-4 ml-4">
@@ -69,12 +42,12 @@ templ Index() {
 							</div>
 						</div>
 					</div>
-					<div class="grid grid-cols-4 gap-4">
+					<div class="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
 						<div>
-							<label class="font-medium">Server & APIs</label>
+							<label class="font-medium">APIs Protection</label>
 							<div class="flex flex-col mt-2 gap-1">
-								@components.Feature(models.CheckStatus, "Swagger document")
-								@components.Feature(models.CheckStatus, "Add a protection layer of API key")
+								@components.Feature(models.CheckStatus, "API key middleware layer")
+								@components.Feature(models.IntermediateStatus, "HMAC signature middleware layer")
 							</div>
 						</div>
 						<div>
@@ -84,7 +57,7 @@ templ Index() {
 								@components.Feature(models.CheckStatus, "Log in with an account")
 								@components.Feature(models.CheckStatus, "Refresh token")
 								@components.Feature(models.CheckStatus, "Log out")
-								@components.Feature(models.IntermediateStatus, "Log in with Google")
+								@components.Feature(models.CheckStatus, "Log in with Google")
 								@components.Feature(models.IntermediateStatus, "Log in with Facebook")
 								@components.Feature(models.IntermediateStatus, "Log in with GitHub")
 							</div>
@@ -119,9 +92,9 @@ templ Index() {
 						</div>
 					</div>
 				</div>
-				<div id="db-design" class="flex flex-col gap-4 px-4">
+				<div id="db-design" class="flex flex-col gap-4 px-8 mt-4">
 					<label class="text-lg font-semibold">Database design</label>
-					<div>
+					<div class="border rounded-md border-neutral-200 overflow-hidden shadow">
 						<iframe class="w-full min-h-[600px]" src="https://dbdiagram.io/e/68d77773d2b621e42226cab2/68da8ac7d2b621e4226879d0"></iframe>
 					</div>
 				</div>

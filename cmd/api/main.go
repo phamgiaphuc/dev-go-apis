@@ -44,7 +44,8 @@ func gracefulShutdown(server *http.Server, done chan bool) {
 
 // @securityDefinitions.apikey	ApiKey
 // @in							header
-// @name						api_key
+// @name						X-ApiKey
+// @description				Insert key to access the apis
 func main() {
 	if lib.MIGRATION_MODE == 1 {
 		database.MigrateDB()

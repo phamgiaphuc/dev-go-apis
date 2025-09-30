@@ -117,6 +117,43 @@ const docTemplate = `{
                 }
             }
         },
+        "/google": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Log in with Google",
+                "responses": {}
+            }
+        },
+        "/google/callback": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Google callback",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.APIResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/permissions": {
             "get": {
                 "produces": [
@@ -457,11 +494,6 @@ const docTemplate = `{
         },
         "/users/{id}": {
             "get": {
-                "security": [
-                    {
-                        "ApiKey": []
-                    }
-                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -814,8 +846,9 @@ const docTemplate = `{
     },
     "securityDefinitions": {
         "ApiKey": {
+            "description": "Insert key to access the apis",
             "type": "apiKey",
-            "name": "api_key",
+            "name": "X-ApiKey",
             "in": "header"
         },
         "Bearer": {

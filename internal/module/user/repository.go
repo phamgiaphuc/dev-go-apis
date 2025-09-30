@@ -2,6 +2,7 @@ package user
 
 import (
 	"context"
+	"database/sql"
 	"dev-go-apis/internal/models"
 	"time"
 
@@ -19,7 +20,61 @@ func NewUserRepository(dbClient *sqlx.DB) *UserRepository {
 	}
 }
 
-func (repo *UserRepository) CreateUser(userWithPassword *models.UserWithPassword) (*models.User, error) {
+func (repo *UserRepository) UpdateUserById(id string, user *models.User) (*models.User, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	query := `
+		UPDATE "users"
+		SET
+			name = $1,
+			email = $2,
+			email_verified = $3,
+			image = $4,
+			is_banned = $5,
+			updated_at = NOW()
+		WHERE id = $6
+	`
+	if _, err := repo.DBClient.ExecContext(ctx, query, user.Name, user.Email, user.EmailVerified, user.Image, user.IsBanned, id); err != nil {
+		return nil, err
+	}
+
+	return user, nil
+}
+
+func (repo *UserRepository) CreateUser(user *models.User) (*models.User, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	query := `
+		INSERT INTO "users" (name, email, image, email_verified)
+		VALUES ($1, $2, $3)
+		RETURNING *, (SELECT name FROM roles WHERE id = role_id) AS role
+	`
+	if err := repo.DBClient.GetContext(ctx, user, query, user.Name, user.Email, user.Image, user.EmailVerified); err != nil {
+		return nil, err
+	}
+
+	return user, nil
+}
+
+func (repo *UserRepository) CreateAccount(account *models.Account) (*models.Account, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	query := `
+		INSERT INTO "accounts" (user_id, account_id, provider_id, password)
+		VALUES ($1, $2, $3, $4)
+		RETURNING *
+	`
+	if err := repo.DBClient.GetContext(ctx, account, query, account.UserID, account.AccountID, account.ProviderId, account.Password); err != nil {
+		return nil, err
+	}
+
+	return account, nil
+}
+
+func (repo *UserRepository) CreateUserAccount(userWithAccount *models.UserWithAccount) (*models.UserWithAccount, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
@@ -33,23 +88,25 @@ func (repo *UserRepository) CreateUser(userWithPassword *models.UserWithPassword
 		}
 	}()
 
-	user := &models.User{}
 	userQuery := `
-		INSERT INTO "users" (name, email, image)
-		VALUES ($1, $2, $3)
+		INSERT INTO "users" (name, email, image, email_verified)
+		VALUES ($1, $2, $3, $4)
 		RETURNING *, (SELECT name FROM roles WHERE id = role_id) AS role;
 	`
-	if err = tx.GetContext(ctx, user, userQuery, userWithPassword.Name, userWithPassword.Email, userWithPassword.Image); err != nil {
+	if err = tx.GetContext(ctx, &userWithAccount.User, userQuery, userWithAccount.User.Name, userWithAccount.User.Email, userWithAccount.User.Image, userWithAccount.User.EmailVerified); err != nil {
 		return nil, err
 	}
 
-	account := &models.Account{}
+	if userWithAccount.Account.AccountID == "" {
+		userWithAccount.Account.AccountID = userWithAccount.User.ID.String()
+	}
+
 	accountQuery := `
 		INSERT INTO "accounts" (user_id, account_id, provider_id, password)
 		VALUES ($1, $2, $3, $4)
-		RETURNING id, user_id, user_id, account_id, provider_id, password, created_at, updated_at;
+		RETURNING *;
 	`
-	if err = tx.GetContext(ctx, account, accountQuery, user.ID, user.ID, models.ProviderCredential, userWithPassword.Password); err != nil {
+	if err = tx.GetContext(ctx, &userWithAccount.Account, accountQuery, userWithAccount.User.ID, userWithAccount.Account.AccountID, userWithAccount.Account.ProviderId, userWithAccount.Account.Password); err != nil {
 		return nil, err
 	}
 
@@ -57,42 +114,41 @@ func (repo *UserRepository) CreateUser(userWithPassword *models.UserWithPassword
 		return nil, err
 	}
 
-	return user, nil
+	return userWithAccount, nil
 }
 
-func (repo *UserRepository) GetUserByEmail(email string) (*models.User, error) {
+func (repo *UserRepository) GetUser(user *models.User) (*models.User, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	user := models.User{}
-	if err := repo.DBClient.GetContext(ctx, &user, `
+	if err := repo.DBClient.GetContext(ctx, user, `
 		SELECT u.*, r.name AS role
 		FROM users u
 		LEFT JOIN roles r ON u.role_id = r.id
-		WHERE u.email = $1
-	`, email); err != nil {
+		WHERE u.id = $1 OR u.email = $2;
+	`, user.ID, user.Email); err != nil {
 		return nil, err
 	}
 
-	return &user, nil
+	return user, nil
 }
 
-func (repo *UserRepository) GetUserWithPasswordByEmail(email string) (*models.UserWithPassword, error) {
+func (repo *UserRepository) GetAccount(account *models.Account) (*models.Account, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	userWithPasssword := &models.UserWithPassword{}
-	if err := repo.DBClient.GetContext(ctx, userWithPasssword, `
-		SELECT u.*, r.name AS role, a.password AS password
-		FROM users u
-		LEFT JOIN roles r ON u.role_id = r.id
-		LEFT JOIN accounts a ON u.id = a.user_id
-		WHERE u.email = $1
-	`, email); err != nil {
+	if err := repo.DBClient.GetContext(ctx, account, `
+		SELECT *
+		FROM accounts a
+		WHERE a.user_id = $1 AND a.provider_id = $2
+	`, account.UserID, account.ProviderId); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
 		return nil, err
 	}
 
-	return userWithPasssword, nil
+	return account, nil
 }
 
 func (repo *UserRepository) GetUserPermissionsByRoleID(roleID int) ([]models.Permission, error) {

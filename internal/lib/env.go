@@ -3,6 +3,7 @@ package lib
 import (
 	"os"
 	"strconv"
+	"strings"
 
 	_ "github.com/joho/godotenv/autoload"
 )
@@ -10,6 +11,17 @@ import (
 func GetEnvString(key string, fallback string) string {
 	if value, exists := os.LookupEnv(key); exists {
 		return value
+	}
+	return fallback
+}
+
+func GetEnvStrings(key string, fallback []string) []string {
+	if value, exists := os.LookupEnv(key); exists {
+		parts := strings.Split(value, ",")
+		for i := range parts {
+			parts[i] = strings.TrimSpace(parts[i])
+		}
+		return parts
 	}
 	return fallback
 }

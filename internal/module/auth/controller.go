@@ -1,17 +1,24 @@
 package auth
 
 import (
+	"context"
 	"dev-go-apis/internal/lib"
 	"dev-go-apis/internal/models"
+	"encoding/json"
 	"log"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"golang.org/x/oauth2"
 )
 
 type IAuthService interface {
 	Register(req *models.RegisterRequest) (*models.User, error)
 	Login(req *models.LoginRequest) (*models.User, error)
 	GenerateJwtTokens(userWithClaims *models.UserWithClaims) (*models.JwtTokens, error)
+	GenerateOAuthState(prefix string) (string, error)
+	CheckOAuthState(state string) (bool, error)
+	LoginWithGoogle(user *models.GoogleUserInfo) (*models.User, error)
 }
 
 type ISessionService interface {
@@ -34,6 +41,68 @@ func (contl *AuthController) RegisterRoutes(rg *gin.RouterGroup) {
 	authGroup := rg.Group("/auth")
 	authGroup.POST("/register", contl.Register)
 	authGroup.POST("/login", contl.Login)
+	authGroup.GET("/google", contl.LoginWithGoogle)
+	authGroup.GET("/google/callback", contl.GoogleCallback)
+}
+
+// LoginWithGoogle godoc
+//
+//	@Summary	Log in with Google
+//	@Tags		Auth
+//	@Accept		json
+//	@Produce	json
+//	@Router		/google [get]
+func (contl *AuthController) LoginWithGoogle(ctx *gin.Context) {
+	state, err := contl.AuthService.GenerateOAuthState(lib.GoogleStatePrefix)
+	if err != nil {
+		lib.SendErrorResponse(ctx, lib.InternalServerError.WithStack(err.Error()))
+	}
+	url := lib.GoogleOAuthConfig.AuthCodeURL(state, oauth2.AccessTypeOffline)
+	ctx.Redirect(http.StatusTemporaryRedirect, url)
+}
+
+// GoogleCallback godoc
+//
+//	@Summary	Google callback
+//	@Tags		Auth
+//	@Accept		json
+//	@Produce	json
+//	@Success	200	{object}	models.APIResponse
+//	@Router		/google/callback [get]
+func (contl *AuthController) GoogleCallback(ctx *gin.Context) {
+	state := ctx.Query("state")
+	if _, err := contl.AuthService.CheckOAuthState(state); err != nil {
+		lib.SendErrorResponse(ctx, lib.InvalidOAuthStateError.WithStack(err.Error()))
+		return
+	}
+
+	code := ctx.Query("code")
+	token, err := lib.GoogleOAuthConfig.Exchange(context.Background(), code)
+	if err != nil {
+		lib.SendErrorResponse(ctx, lib.InternalServerError.WithStack(err.Error()))
+		return
+	}
+
+	client := lib.GoogleOAuthConfig.Client(context.Background(), token)
+	resp, err := client.Get(lib.GoogleOAuthUserInfoURl)
+	if err != nil {
+		lib.SendErrorResponse(ctx, lib.InternalServerError.WithStack(err.Error()))
+		return
+	}
+	defer resp.Body.Close()
+
+	var googleUserInfo models.GoogleUserInfo
+	if err := json.NewDecoder(resp.Body).Decode(&googleUserInfo); err != nil {
+		log.Fatal(err)
+	}
+
+	user, err := contl.AuthService.LoginWithGoogle(&googleUserInfo)
+	if err != nil {
+		lib.SendErrorResponse(ctx, lib.InternalServerError.WithStack(err.Error()))
+		return
+	}
+
+	lib.SendSucceedResponse(ctx, user)
 }
 
 // Register godoc
@@ -50,7 +119,6 @@ func (contl *AuthController) Register(ctx *gin.Context) {
 	var req models.RegisterRequest
 
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		log.Printf("Binding failed: %v\n", err)
 		ctx.Error(lib.InvalidBodyRequestError.WithStack(err.Error()))
 		return
 	}

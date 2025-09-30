@@ -39,7 +39,7 @@ func NewUserController(service IUserService, cacheService ICacheService) *UserCo
 
 func (contl *UserController) RegisterRoutes(rg *gin.RouterGroup) {
 	userGroup := rg.Group("/users")
-	userGroup.GET("/:id", contl.GetUserById)
+	userGroup.GET("/:id", middleware.ApiHmacHandler(), contl.GetUserById)
 	userGroup.GET("/me",
 		middleware.AccessTokenHandler(),
 		middleware.PermissionHandler(
@@ -77,7 +77,6 @@ func (contl *UserController) GetMe(ctx *gin.Context) {
 //	@Param		id	path		string	true	"User ID"
 //	@Success	200	{object}	models.APIResponse{data=models.UserWithAccounts}
 //	@Router		/users/{id} [get]
-//	@Security	ApiKey
 func (contl *UserController) GetUserById(ctx *gin.Context) {
 	var req GetUserByIDRequest
 

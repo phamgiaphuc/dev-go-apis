@@ -33,6 +33,7 @@ func NewRouter(dbClient *sqlx.DB, cacheClient *redis.Client) *Router {
 	gin.SetMode(lib.GIN_MODE)
 	router := gin.Default()
 
+	router.Use(middleware.CorsHandler())
 	router.Use(middleware.ErrorsHandler())
 
 	return &Router{
@@ -53,11 +54,6 @@ func (r *Router) InitRoutes() http.Handler {
 
 	r.Router.GET("/docs/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 
-	/**
-	 * Middlewares
-	 */
-	r.Router.Use(middleware.ApiKeyHandler())
-
 	apiGroup := r.Router.Group("/api")
 
 	/**
@@ -73,7 +69,7 @@ func (r *Router) InitRoutes() http.Handler {
 	 * Services
 	 */
 	cacheService := cache.NewCacheService(cacheRepo)
-	authService := auth.NewAuthService(userRepo)
+	authService := auth.NewAuthService(userRepo, cacheRepo)
 	userService := user.NewUserService(userRepo)
 	sessionService := session.NewSessionService(sessionRepo)
 	permissionService := permission.NewPermissionService(permissionRepo)

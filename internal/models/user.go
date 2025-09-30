@@ -21,9 +21,14 @@ type User struct {
 	Role string `json:"role"`
 }
 
-type UserWithPassword struct {
-	User
-	Password string `json:"password"`
+type UserWithOAuth struct {
+	User    User
+	Account Account
+}
+
+type UserWithAccount struct {
+	User    User    `json:"user" db:"user"`
+	Account Account `json:"account" db:"account"`
 }
 
 type UserWithClaims struct {
