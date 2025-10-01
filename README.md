@@ -1,4 +1,12 @@
-# Dev Go APIs
+<div style="text-align: center; margin-top: 50px;">
+  <h1 style="font-size: 3rem; margin-bottom: 0.5rem;">
+    Dev Go APIs
+  </h1>
+  <h3 style="font-weight: normal; color: #d4d4d4;">
+    This is a useless API project built for learning purposes.
+  </h3>
+  <img src="./screeshot.png" alt="Screenshot" style="margin-top: 1rem; max-width: 100%; height: auto;">
+</div>
 
 ## Table of Contents
 
