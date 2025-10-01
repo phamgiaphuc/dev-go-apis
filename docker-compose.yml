@@ -49,6 +49,7 @@ services:
       PORT: ${PORT}
       SERVER_URL: ${SERVER_URL}
       API_KEY: ${API_KEY}
+      HMAC_SECRET_KEY: ${HMAC_SECRET_KEY}
       CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS}
       ACCESS_TOKEN_SECRET: ${ACCESS_TOKEN_SECRET}
       REFRESH_TOKEN_SECRET: ${REFRESH_TOKEN_SECRET}
@@ -73,13 +74,13 @@ services:
 
       LABEL_con1: postgres_db
       SERVER_con1: postgres
-      USER_con1: postgres
-      PASSWORD_con1: postgres
+      USER_con1: ${POSTGRES_USER:-postgres}
+      PASSWORD_con1: ${POSTGRES_PASSWORD:-postgres}
       PORT_con1: 5432
       ENGINE_con1: postgres@dbgate-plugin-postgres
 
       LABEL_con2: redis_db
-      URL_con2: redis://default:redis123@redis:6379/0
+      URL_con2: ${REDIS_URL:-redis://default:redis123@redis:6379/0}
       ENGINE_con2: redis@dbgate-plugin-redis
 
 volumes:

@@ -57,7 +57,9 @@ func main() {
 	cacheClient := database.NewRedisClient()
 	defer cacheClient.Close()
 
-	server := server.NewServer(dbClient, cacheClient)
+	rateLimiter := database.NewRateLimter(cacheClient)
+
+	server := server.NewServer(dbClient, cacheClient, rateLimiter)
 
 	done := make(chan bool, 1)
 

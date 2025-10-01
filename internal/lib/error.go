@@ -15,9 +15,10 @@ var (
 	ResourceForbiddenError            = &models.APIError{Code: http.StatusForbidden, Message: "Resource forbidden"}
 	UnauthorizedError                 = &models.APIError{Code: http.StatusUnauthorized, Message: "Unauthorized"}
 	MissingAPIKeyError                = &models.APIError{Code: http.StatusUnauthorized, Message: "Missing api key"}
-	MissingSignatureAndTimestampError = &models.APIError{Code: http.StatusUnauthorized, Message: "Missing signature and timestamp"}
-	ExpiredTimestampError             = &models.APIError{Code: http.StatusUnauthorized, Message: "Expired timestamp"}
-	InvalidSignatureError             = &models.APIError{Code: http.StatusBadRequest, Message: "Invalid signature"}
+	MissingSignatureAndTimestampError = &models.APIError{Code: http.StatusUnauthorized, Message: "Missing request signature and timestamp"}
+	ExpiredTimestampError             = &models.APIError{Code: http.StatusUnauthorized, Message: "Expired request timestamp"}
+	InvalidSignatureError             = &models.APIError{Code: http.StatusBadRequest, Message: "Invalid request signature"}
+	TooManyRequestsError              = &models.APIError{Code: http.StatusTooManyRequests, Message: "Too many requests"}
 )
 
 func NewAPIError(code int, message, stack string) *models.APIError {

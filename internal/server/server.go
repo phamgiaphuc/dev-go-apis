@@ -8,12 +8,13 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/go-redis/redis_rate/v10"
 	"github.com/jmoiron/sqlx"
 	"github.com/redis/go-redis/v9"
 )
 
-func NewServer(dbClient *sqlx.DB, cacheClient *redis.Client) *http.Server {
-	router := router.NewRouter(dbClient, cacheClient)
+func NewServer(dbClient *sqlx.DB, cacheClient *redis.Client, rateLimiter *redis_rate.Limiter) *http.Server {
+	router := router.NewRouter(dbClient, cacheClient, rateLimiter)
 
 	docs.SwaggerInfo.Host = fmt.Sprintf("localhost:%d", lib.PORT)
 	docs.SwaggerInfo.BasePath = "/api"

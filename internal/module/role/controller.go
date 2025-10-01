@@ -2,7 +2,6 @@ package role
 
 import (
 	"dev-go-apis/internal/lib"
-	"dev-go-apis/internal/middleware"
 	"dev-go-apis/internal/models"
 	"net/http"
 
@@ -29,7 +28,6 @@ func NewRoleController(roleService IRoleService) *RoleController {
 
 func (contl *RoleController) RegisterRoutes(rg *gin.RouterGroup) {
 	roleGroup := rg.Group("/roles")
-	roleGroup.Use(middleware.AccessTokenHandler())
 	roleGroup.GET("/", contl.GetRolePermissionsList)
 	roleGroup.POST("/", contl.CreateRole)
 	roleGroup.PUT("/", contl.UpdateRolePermissions)
@@ -134,7 +132,6 @@ func (contl *RoleController) GetRolePermissionsById(ctx *gin.Context) {
 //	@Failure	400	{object}	models.APIResponse
 //	@Failure	500	{object}	models.APIResponse
 //	@Router		/roles [get]
-//	@Security	Bearer
 func (contl *RoleController) GetRolePermissionsList(ctx *gin.Context) {
 	roleList, err := contl.RoleService.GetRolePermissionsList()
 	if err != nil {

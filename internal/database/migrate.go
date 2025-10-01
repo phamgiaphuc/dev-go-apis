@@ -17,7 +17,6 @@ func MigrateDB() {
 	log.Printf("🎉 Migrating database")
 
 	ctx := context.Background()
-
 	db, err := sql.Open("postgres", lib.DATABASE_URL)
 	if err != nil {
 		log.Fatalln(err)

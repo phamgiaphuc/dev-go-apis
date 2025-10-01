@@ -6,6 +6,7 @@ import (
 	"log"
 	"time"
 
+	"github.com/go-redis/redis_rate/v10"
 	"github.com/redis/go-redis/v9"
 )
 
@@ -14,7 +15,6 @@ func NewRedisClient() *redis.Client {
 	if err != nil {
 		log.Fatalln(err)
 	}
-
 	redisClient := redis.NewClient(redisOpts)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
@@ -27,4 +27,9 @@ func NewRedisClient() *redis.Client {
 	log.Printf("🎉 Redis is connected")
 
 	return redisClient
+}
+
+func NewRateLimter(client *redis.Client) *redis_rate.Limiter {
+	limiter := redis_rate.NewLimiter(client)
+	return limiter
 }

@@ -13,6 +13,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-redis/redis_rate/v10"
 	"github.com/jmoiron/sqlx"
 	"github.com/redis/go-redis/v9"
 	swaggerfiles "github.com/swaggo/files"
@@ -27,19 +28,18 @@ type Router struct {
 	DBClient    *sqlx.DB
 	CacheClient *redis.Client
 	Router      *gin.Engine
+	RateLimiter *redis_rate.Limiter
 }
 
-func NewRouter(dbClient *sqlx.DB, cacheClient *redis.Client) *Router {
+func NewRouter(dbClient *sqlx.DB, cacheClient *redis.Client, rateLimiter *redis_rate.Limiter) *Router {
 	gin.SetMode(lib.GIN_MODE)
 	router := gin.Default()
-
-	router.Use(middleware.CorsHandler())
-	router.Use(middleware.ErrorsHandler())
 
 	return &Router{
 		DBClient:    dbClient,
 		CacheClient: cacheClient,
 		Router:      router,
+		RateLimiter: rateLimiter,
 	}
 }
 
@@ -53,6 +53,13 @@ func (r *Router) InitRoutes() http.Handler {
 	})
 
 	r.Router.GET("/docs/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
+
+	/**
+	 * Middlewares
+	 */
+	r.Router.Use(middleware.CorsHandler())
+	r.Router.Use(middleware.ApiRateLimiterHandler(r.RateLimiter))
+	r.Router.Use(middleware.ErrorsHandler())
 
 	apiGroup := r.Router.Group("/api")
 

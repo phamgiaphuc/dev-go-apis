@@ -10,8 +10,8 @@ var (
 	PORT            = GetEnvInt("PORT", 8000)
 	SERVER_URL      = GetEnvString("SERVER_URL", "http://localhost:8000")
 	CLIENT_URL      = GetEnvString("CLIENT_URL", "http://localhost:3000")
-	API_KEY         = GetEnvString("API_KEY", "@secret123")
-	HMAC_SECRET_KEY = GetEnvString("HMAC_SECRET_KEY", "@secret123")
+	API_KEY         = GetEnvString("API_KEY", "")
+	HMAC_SECRET_KEY = GetEnvString("HMAC_SECRET_KEY", "")
 
 	// Cors
 	CORS_ALLOWED_ORIGINS = GetEnvStrings("CORS_ALLOWED_ORIGINS", []string{"http://localhost:3000", "http://localhost:5173"})
