@@ -2,14 +2,15 @@ package main
 
 import (
 	"context"
-	"dev-go-apis/internal/database"
-	"dev-go-apis/internal/lib"
-	"dev-go-apis/internal/server"
 	"log"
 	"net/http"
 	"os/signal"
 	"syscall"
 	"time"
+
+	"dev-go-apis/internal/database"
+	"dev-go-apis/internal/lib"
+	"dev-go-apis/internal/server"
 )
 
 func gracefulShutdown(server *http.Server, done chan bool) {

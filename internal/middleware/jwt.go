@@ -1,8 +1,9 @@
 package middleware
 
 import (
-	"dev-go-apis/internal/lib"
 	"strings"
+
+	"dev-go-apis/internal/lib"
 
 	"github.com/gin-gonic/gin"
 )

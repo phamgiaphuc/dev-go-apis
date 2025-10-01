@@ -10,6 +10,9 @@ swag: # Generate Swagger docs
 	@swag fmt
 	@swag init -g cmd/api/main.go -o ./docs
 
+fmt: # Format code
+	@gofumpt -l -w .
+
 goose-up: # DB migration up
 	@goose -dir=./internal/database/migration postgres $(DATABASE_URL) up
 

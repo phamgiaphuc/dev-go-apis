@@ -1,11 +1,12 @@
 package auth
 
 import (
-	"dev-go-apis/internal/lib"
-	"dev-go-apis/internal/models"
 	"fmt"
 	"log"
 	"time"
+
+	"dev-go-apis/internal/lib"
+	"dev-go-apis/internal/models"
 )
 
 type IUserRepository interface {

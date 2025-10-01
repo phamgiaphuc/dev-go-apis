@@ -1,9 +1,10 @@
 package middleware
 
 import (
+	"net/http"
+
 	"dev-go-apis/internal/lib"
 	"dev-go-apis/internal/models"
-	"net/http"
 
 	"github.com/gin-gonic/gin"
 )

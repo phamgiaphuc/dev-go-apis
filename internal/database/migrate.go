@@ -3,9 +3,10 @@ package database
 import (
 	"context"
 	"database/sql"
+	"log"
+
 	"dev-go-apis/internal/database/migration"
 	"dev-go-apis/internal/lib"
-	"log"
 
 	"github.com/pressly/goose/v3"
 	"github.com/pressly/goose/v3/database"

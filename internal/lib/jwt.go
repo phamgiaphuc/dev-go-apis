@@ -1,8 +1,9 @@
 package lib
 
 import (
-	"dev-go-apis/internal/models"
 	"time"
+
+	"dev-go-apis/internal/models"
 
 	"github.com/golang-jwt/jwt/v5"
 )

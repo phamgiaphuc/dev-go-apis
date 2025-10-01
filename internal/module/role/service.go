@@ -1,10 +1,11 @@
 package role
 
 import (
-	"dev-go-apis/internal/models"
 	"fmt"
 	"log"
 	"time"
+
+	"dev-go-apis/internal/models"
 )
 
 type IRoleRepository interface {

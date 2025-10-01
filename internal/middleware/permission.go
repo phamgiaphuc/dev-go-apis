@@ -1,13 +1,14 @@
 package middleware
 
 import (
-	"dev-go-apis/internal/lib"
-	"dev-go-apis/internal/models"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"slices"
 	"time"
+
+	"dev-go-apis/internal/lib"
+	"dev-go-apis/internal/models"
 
 	"github.com/gin-gonic/gin"
 )

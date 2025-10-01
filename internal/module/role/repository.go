@@ -2,9 +2,10 @@ package role
 
 import (
 	"context"
-	"dev-go-apis/internal/models"
 	"log"
 	"time"
+
+	"dev-go-apis/internal/models"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"

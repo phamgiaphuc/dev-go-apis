@@ -2,8 +2,9 @@ package session
 
 import (
 	"context"
-	"dev-go-apis/internal/models"
 	"time"
+
+	"dev-go-apis/internal/models"
 
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"

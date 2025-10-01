@@ -2,8 +2,9 @@ package permission
 
 import (
 	"context"
-	"dev-go-apis/internal/models"
 	"time"
+
+	"dev-go-apis/internal/models"
 
 	"github.com/jmoiron/sqlx"
 )

@@ -3,8 +3,9 @@ package user
 import (
 	"context"
 	"database/sql"
-	"dev-go-apis/internal/models"
 	"time"
+
+	"dev-go-apis/internal/models"
 
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"

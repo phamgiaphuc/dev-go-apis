@@ -1,9 +1,10 @@
 package database
 
 import (
-	"dev-go-apis/internal/lib"
 	"log"
 	"time"
+
+	"dev-go-apis/internal/lib"
 
 	"github.com/jmoiron/sqlx"
 

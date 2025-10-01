@@ -1,8 +1,9 @@
 package permission
 
 import (
-	"dev-go-apis/internal/models"
 	"net/http"
+
+	"dev-go-apis/internal/models"
 
 	"github.com/gin-gonic/gin"
 )

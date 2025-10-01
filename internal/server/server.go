@@ -1,12 +1,13 @@
 package server
 
 import (
-	"dev-go-apis/docs"
-	"dev-go-apis/internal/lib"
-	"dev-go-apis/internal/router"
 	"fmt"
 	"net/http"
 	"time"
+
+	"dev-go-apis/docs"
+	"dev-go-apis/internal/lib"
+	"dev-go-apis/internal/router"
 
 	"github.com/go-redis/redis_rate/v10"
 	"github.com/jmoiron/sqlx"

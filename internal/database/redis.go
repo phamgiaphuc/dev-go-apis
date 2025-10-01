@@ -2,9 +2,10 @@ package database
 
 import (
 	"context"
-	"dev-go-apis/internal/lib"
 	"log"
 	"time"
+
+	"dev-go-apis/internal/lib"
 
 	"github.com/go-redis/redis_rate/v10"
 	"github.com/redis/go-redis/v9"

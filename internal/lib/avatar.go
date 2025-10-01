@@ -5,15 +5,13 @@ import (
 	"math/rand"
 )
 
-var (
-	AVATARS = []string{
-		"/static/avatars/ava1.png",
-		"/static/avatars/ava2.png",
-		"/static/avatars/ava3.png",
-		"/static/avatars/ava4.png",
-		"/static/avatars/ava5.png",
-	}
-)
+var AVATARS = []string{
+	"/static/avatars/ava1.png",
+	"/static/avatars/ava2.png",
+	"/static/avatars/ava3.png",
+	"/static/avatars/ava4.png",
+	"/static/avatars/ava5.png",
+}
 
 func GetRandomAvatar() string {
 	result := fmt.Sprintf("%s%s", SERVER_URL, AVATARS[rand.Intn(len(AVATARS))])

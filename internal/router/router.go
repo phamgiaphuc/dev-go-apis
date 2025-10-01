@@ -1,6 +1,8 @@
 package router
 
 import (
+	"net/http"
+
 	"dev-go-apis/internal/lib"
 	"dev-go-apis/internal/middleware"
 	"dev-go-apis/internal/module/auth"
@@ -10,7 +12,6 @@ import (
 	"dev-go-apis/internal/module/session"
 	"dev-go-apis/internal/module/user"
 	"dev-go-apis/internal/views"
-	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis_rate/v10"

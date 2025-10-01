@@ -1,12 +1,13 @@
 package user
 
 import (
-	"dev-go-apis/internal/lib"
-	"dev-go-apis/internal/middleware"
-	"dev-go-apis/internal/models"
 	"fmt"
 	"net/http"
 	"time"
+
+	"dev-go-apis/internal/lib"
+	"dev-go-apis/internal/middleware"
+	"dev-go-apis/internal/models"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"

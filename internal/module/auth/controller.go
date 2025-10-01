@@ -2,12 +2,13 @@ package auth
 
 import (
 	"context"
-	"dev-go-apis/internal/lib"
-	"dev-go-apis/internal/middleware"
-	"dev-go-apis/internal/models"
 	"encoding/json"
 	"log"
 	"net/http"
+
+	"dev-go-apis/internal/lib"
+	"dev-go-apis/internal/middleware"
+	"dev-go-apis/internal/models"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
