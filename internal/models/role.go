@@ -1,5 +1,7 @@
 package models
 
+import "github.com/lib/pq"
+
 type Role struct {
 	ID          int     `db:"id" json:"id" binding:"required"`
 	Name        string  `db:"name" json:"name"`
@@ -8,15 +10,14 @@ type Role struct {
 
 type RoleIDs []int
 
-type RolePermissions struct {
-	Role
-	Permissions   Permissions   `db:"permissions" json:"-"`
-	PermissionIDs PermissionIDs `json:"permission_ids"`
+type RoleWithPermissions struct {
+	Role          `json:",inline"`
+	PermissionIDs pq.Int64Array `db:"permission_ids" json:"permission_ids" swaggertype:"array,integer"`
 }
 
-type RolePermissionsList []RolePermissions
+type RoleList []RoleWithPermissions
 
-type GetRolePermissionsByIdRequest struct {
+type GetRoleByIdRequest struct {
 	ID int `uri:"id" binding:"required"`
 }
 
@@ -25,10 +26,10 @@ type CreateRoleRequest struct {
 	Description *string `db:"description" json:"description"`
 }
 
-type UpdateRolePermissionsRequest struct {
-	RolePermissions `json:",inline"`
+type UpdateRoleRequest struct {
+	RoleWithPermissions `json:",inline"`
 }
 
-type DeleteRolePermissionsRequest struct {
+type DeleteRolesRequest struct {
 	RoleIDs `json:"role_ids" binding:"required"`
 }

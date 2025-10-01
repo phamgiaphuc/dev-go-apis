@@ -3,6 +3,7 @@ package role
 import (
 	"context"
 	"dev-go-apis/internal/models"
+	"log"
 	"time"
 
 	"github.com/jmoiron/sqlx"
@@ -19,7 +20,7 @@ func NewRoleRepository(dbClient *sqlx.DB) *RoleRepository {
 	}
 }
 
-func (repo *RoleRepository) DeleteRolePermissions(roleIds *models.RoleIDs) error {
+func (repo *RoleRepository) DeleteRole(roleIds *models.RoleIDs) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
@@ -31,7 +32,7 @@ func (repo *RoleRepository) DeleteRolePermissions(roleIds *models.RoleIDs) error
 	return nil
 }
 
-func (repo *RoleRepository) UpdateRolePermissionsByID(rolePermissions *models.RolePermissions) (*models.RolePermissions, error) {
+func (repo *RoleRepository) UpdateRoleById(roleWithPermissions *models.RoleWithPermissions) (*models.RoleWithPermissions, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
@@ -54,7 +55,7 @@ func (repo *RoleRepository) UpdateRolePermissionsByID(rolePermissions *models.Ro
 		WHERE id = $1
 		RETURNING id, name, description;
 	`
-	if err = tx.GetContext(ctx, role, roleQuery, rolePermissions.ID, rolePermissions.Name, rolePermissions.Description); err != nil {
+	if err = tx.GetContext(ctx, role, roleQuery, roleWithPermissions.ID, roleWithPermissions.Name, roleWithPermissions.Description); err != nil {
 		return nil, err
 	}
 
@@ -62,12 +63,12 @@ func (repo *RoleRepository) UpdateRolePermissionsByID(rolePermissions *models.Ro
     DELETE FROM role_permissions 
     WHERE role_id = $1 AND permission_id <> ALL($2)
 	`
-	_, err = tx.ExecContext(ctx, deleteQuery, rolePermissions.Role.ID, pq.Array(rolePermissions.PermissionIDs))
+	_, err = tx.ExecContext(ctx, deleteQuery, roleWithPermissions.Role.ID, pq.Array(roleWithPermissions.PermissionIDs))
 	if err != nil {
 		return nil, err
 	}
 
-	if len(rolePermissions.PermissionIDs) > 0 {
+	if len(roleWithPermissions.PermissionIDs) > 0 {
 		insertQuery := `
 			INSERT INTO role_permissions (role_id, permission_id)
 			SELECT $1, p_id
@@ -77,8 +78,8 @@ func (repo *RoleRepository) UpdateRolePermissionsByID(rolePermissions *models.Ro
 		_, err = tx.ExecContext(
 			ctx,
 			insertQuery,
-			rolePermissions.ID,
-			pq.Array(rolePermissions.PermissionIDs),
+			roleWithPermissions.ID,
+			pq.Array(roleWithPermissions.PermissionIDs),
 		)
 		if err != nil {
 			return nil, err
@@ -89,79 +90,69 @@ func (repo *RoleRepository) UpdateRolePermissionsByID(rolePermissions *models.Ro
 		return nil, err
 	}
 
-	return rolePermissions, nil
+	return roleWithPermissions, nil
 }
 
-func (repo *RoleRepository) GetRolePermissionsByID(role *models.Role) (*models.RolePermissions, error) {
+func (repo *RoleRepository) GetRoleById(roleWithPermissions *models.RoleWithPermissions) (*models.RoleWithPermissions, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	rolePermissions := &models.RolePermissions{}
-	if err := repo.DBClient.GetContext(ctx, rolePermissions, `
+	if err := repo.DBClient.GetContext(ctx, roleWithPermissions, `
 		SELECT r.*,
 		COALESCE(
-			json_agg(
-				json_build_object(
-					'id', p.id,
-					'name', p.name,
-					'description', p.description,
-					'group_id', p.group_id
-				)
-			) FILTER (WHERE p.id IS NOT NULL), '[]'
-		) AS permissions
+			ARRAY_AGG(
+				p.id
+			) FILTER (WHERE p.id IS NOT NULL), '{}'
+		) AS permission_ids
 		FROM roles r
 		LEFT JOIN role_permissions rp ON rp.role_id = r.id
 		LEFT JOIN permissions p ON p.id = rp.permission_id
 		WHERE r.id = $1
 		GROUP BY r.id, r.name, r.description
 		ORDER BY r.id;
-	`, role.ID); err != nil {
+	`, roleWithPermissions.ID); err != nil {
 		return nil, err
 	}
 
-	return rolePermissions, nil
+	return roleWithPermissions, nil
 }
 
-func (repo *RoleRepository) CreateRole(role *models.Role) (*models.Role, error) {
+func (repo *RoleRepository) CreateRole(roleWithPermissions *models.RoleWithPermissions) (*models.RoleWithPermissions, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	if err := repo.DBClient.GetContext(ctx, role, `
+	if err := repo.DBClient.GetContext(ctx, roleWithPermissions, `
 		INSERT INTO "roles" (name, description)
 		VALUES ($1, $2)
 		RETURNING *;
-	`, role.Name, role.Description); err != nil {
+	`, roleWithPermissions.Name, roleWithPermissions.Description); err != nil {
 		return nil, err
 	}
 
-	return role, nil
+	return roleWithPermissions, nil
 }
 
-func (repo *RoleRepository) GetRolePermissionsList() (*models.RolePermissionsList, error) {
+func (repo *RoleRepository) GetRoleList() (*models.RoleList, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	rolePermissionsList := &models.RolePermissionsList{}
-	if err := repo.DBClient.SelectContext(ctx, rolePermissionsList, `
+	roleList := &models.RoleList{}
+	if err := repo.DBClient.SelectContext(ctx, roleList, `
 		SELECT r.*,
 		COALESCE(
-			json_agg(
-				json_build_object(
-					'id', p.id,
-					'name', p.name,
-					'description', p.description,
-					'group_id', p.group_id
-				)
-			) FILTER (WHERE p.id IS NOT NULL), '[]'
-		) AS permissions
+			ARRAY_AGG(
+				p.id
+			) FILTER (WHERE p.id IS NOT NULL), '{}'
+		) AS permission_ids
 		FROM roles r
 		LEFT JOIN role_permissions rp ON rp.role_id = r.id
 		LEFT JOIN permissions p ON p.id = rp.permission_id
 		GROUP BY r.id, r.name, r.description
 		ORDER BY r.id;
 	`); err != nil {
+		log.Printf("%v\n", err)
 		return nil, err
 	}
 
-	return rolePermissionsList, nil
+	return roleList, nil
 }

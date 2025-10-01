@@ -2,12 +2,8 @@ package middleware
 
 import (
 	"bytes"
-	"crypto/hmac"
-	"crypto/sha256"
 	"dev-go-apis/internal/lib"
-	"encoding/hex"
 	"io"
-	"log"
 	"strconv"
 	"time"
 
@@ -21,17 +17,24 @@ func ApiKeyHandler() gin.HandlerFunc {
 			ctx.Next()
 			return
 		}
+
 		apiKey := ctx.GetHeader("X-ApiKey")
 		if apiKey == "" || apiKey != lib.API_KEY {
 			lib.SendErrorResponse(ctx, lib.MissingAPIKeyError)
 			return
 		}
+
 		ctx.Next()
 	}
 }
 
 func ApiHmacHandler() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
+		if lib.HMAC_SECRET_KEY == "" {
+			ctx.Next()
+			return
+		}
+
 		signature := ctx.GetHeader("X-Signature")
 		timestamp := ctx.GetHeader("X-Timestamp")
 
@@ -40,8 +43,8 @@ func ApiHmacHandler() gin.HandlerFunc {
 			return
 		}
 
-		ts, err := time.Parse(time.RFC3339, timestamp)
-		if err != nil || time.Since(ts) > 5*time.Minute {
+		ts, err := lib.ParseUnixTime(timestamp)
+		if err != nil || time.Since(ts) > time.Minute {
 			lib.SendErrorResponse(ctx, lib.ExpiredTimestampError)
 			return
 		}
@@ -50,13 +53,10 @@ func ApiHmacHandler() gin.HandlerFunc {
 		ctx.Request.Body = io.NopCloser(bytes.NewBuffer(body))
 
 		data := ctx.Request.Method + ctx.Request.URL.Path + string(body) + timestamp
-		log.Printf("%v\n", data)
 
-		mac := hmac.New(sha256.New, []byte(lib.HMAC_SECRET_KEY))
-		mac.Write([]byte(data))
-		expectedMAC := hex.EncodeToString(mac.Sum(nil))
+		expectedSignature := lib.GenerateSHA256(data, lib.HMAC_SECRET_KEY)
 
-		if !hmac.Equal([]byte(signature), []byte(expectedMAC)) {
+		if !lib.CompareSHA256(signature, expectedSignature) {
 			lib.SendErrorResponse(ctx, lib.InvalidSignatureError)
 			return
 		}
@@ -69,7 +69,7 @@ func ApiRateLimiterHandler(limiter *redis_rate.Limiter) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		key := ctx.ClientIP()
 
-		res, err := limiter.Allow(ctx, key, redis_rate.PerMinute(10))
+		res, err := limiter.Allow(ctx, key, redis_rate.PerMinute(20))
 		if err != nil {
 			lib.SendErrorResponse(ctx, lib.InternalServerError)
 			return

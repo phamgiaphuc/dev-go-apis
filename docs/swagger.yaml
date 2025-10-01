@@ -32,7 +32,7 @@ definitions:
     required:
     - name
     type: object
-  models.DeleteRolePermissionsRequest:
+  models.DeleteRolesRequest:
     properties:
       role_ids:
         items:
@@ -75,6 +75,11 @@ definitions:
     - ProviderCredential
     - ProviderGoogle
     - ProviderGithub
+  models.RefreshTokenResponse:
+    properties:
+      access_token:
+        type: string
+    type: object
   models.RegisterRequest:
     properties:
       email:
@@ -111,18 +116,7 @@ definitions:
       updated_at:
         type: string
     type: object
-  models.Role:
-    properties:
-      description:
-        type: string
-      id:
-        type: integer
-      name:
-        type: string
-    required:
-    - id
-    type: object
-  models.RolePermissions:
+  models.RoleWithPermissions:
     properties:
       description:
         type: string
@@ -137,7 +131,7 @@ definitions:
     required:
     - id
     type: object
-  models.UpdateRolePermissionsRequest:
+  models.UpdateRoleRequest:
     properties:
       description:
         type: string
@@ -238,6 +232,25 @@ paths:
       summary: Login a user
       tags:
       - Auth
+  /auth/refresh-token:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.RefreshTokenResponse'
+              type: object
+      summary: Refresh token
+      tags:
+      - Auth
   /auth/register:
     post:
       consumes:
@@ -315,7 +328,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/models.DeleteRolePermissionsRequest'
+          $ref: '#/definitions/models.DeleteRolesRequest'
       produces:
       - application/json
       responses:
@@ -331,8 +344,6 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.APIResponse'
-      security:
-      - Bearer: []
       summary: Delete roles
       tags:
       - Role
@@ -348,7 +359,7 @@ paths:
             - properties:
                 data:
                   items:
-                    $ref: '#/definitions/models.RolePermissions'
+                    $ref: '#/definitions/models.RoleWithPermissions'
                   type: array
               type: object
         "400":
@@ -359,8 +370,6 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.APIResponse'
-      security:
-      - Bearer: []
       summary: Get list of roles
       tags:
       - Role
@@ -384,7 +393,7 @@ paths:
             - $ref: '#/definitions/models.APIResponse'
             - properties:
                 data:
-                  $ref: '#/definitions/models.Role'
+                  $ref: '#/definitions/models.RoleWithPermissions'
               type: object
         "400":
           description: Bad Request
@@ -394,8 +403,6 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.APIResponse'
-      security:
-      - Bearer: []
       summary: Create a new role
       tags:
       - Role
@@ -408,7 +415,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/models.UpdateRolePermissionsRequest'
+          $ref: '#/definitions/models.UpdateRoleRequest'
       produces:
       - application/json
       responses:
@@ -419,7 +426,7 @@ paths:
             - $ref: '#/definitions/models.APIResponse'
             - properties:
                 data:
-                  $ref: '#/definitions/models.RolePermissions'
+                  $ref: '#/definitions/models.RoleWithPermissions'
               type: object
         "400":
           description: Bad Request
@@ -429,8 +436,6 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.APIResponse'
-      security:
-      - Bearer: []
       summary: Update a role
       tags:
       - Role
@@ -454,7 +459,7 @@ paths:
             - $ref: '#/definitions/models.APIResponse'
             - properties:
                 data:
-                  $ref: '#/definitions/models.RolePermissions'
+                  $ref: '#/definitions/models.RoleWithPermissions'
               type: object
         "400":
           description: Bad Request
@@ -464,8 +469,6 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.APIResponse'
-      security:
-      - Bearer: []
       summary: Get role by ID
       tags:
       - Role

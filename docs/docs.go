@@ -66,6 +66,40 @@ const docTemplate = `{
                 }
             }
         },
+        "/auth/refresh-token": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Refresh token",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/models.APIResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/models.RefreshTokenResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
         "/auth/register": {
             "post": {
                 "consumes": [
@@ -175,11 +209,6 @@ const docTemplate = `{
         },
         "/roles": {
             "get": {
-                "security": [
-                    {
-                        "Bearer": []
-                    }
-                ],
                 "produces": [
                     "application/json"
                 ],
@@ -201,7 +230,7 @@ const docTemplate = `{
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/definitions/models.RolePermissions"
+                                                "$ref": "#/definitions/models.RoleWithPermissions"
                                             }
                                         }
                                     }
@@ -224,11 +253,6 @@ const docTemplate = `{
                 }
             },
             "put": {
-                "security": [
-                    {
-                        "Bearer": []
-                    }
-                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -246,7 +270,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.UpdateRolePermissionsRequest"
+                            "$ref": "#/definitions/models.UpdateRoleRequest"
                         }
                     }
                 ],
@@ -262,7 +286,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/models.RolePermissions"
+                                            "$ref": "#/definitions/models.RoleWithPermissions"
                                         }
                                     }
                                 }
@@ -284,11 +308,6 @@ const docTemplate = `{
                 }
             },
             "post": {
-                "security": [
-                    {
-                        "Bearer": []
-                    }
-                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -322,7 +341,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/models.Role"
+                                            "$ref": "#/definitions/models.RoleWithPermissions"
                                         }
                                     }
                                 }
@@ -344,11 +363,6 @@ const docTemplate = `{
                 }
             },
             "delete": {
-                "security": [
-                    {
-                        "Bearer": []
-                    }
-                ],
                 "description": "Remove roles",
                 "consumes": [
                     "application/json"
@@ -367,7 +381,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.DeleteRolePermissionsRequest"
+                            "$ref": "#/definitions/models.DeleteRolesRequest"
                         }
                     }
                 ],
@@ -395,11 +409,6 @@ const docTemplate = `{
         },
         "/roles/{id}": {
             "get": {
-                "security": [
-                    {
-                        "Bearer": []
-                    }
-                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -431,7 +440,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/models.RolePermissions"
+                                            "$ref": "#/definitions/models.RoleWithPermissions"
                                         }
                                     }
                                 }
@@ -586,7 +595,7 @@ const docTemplate = `{
                 }
             }
         },
-        "models.DeleteRolePermissionsRequest": {
+        "models.DeleteRolesRequest": {
             "type": "object",
             "required": [
                 "role_ids"
@@ -650,6 +659,14 @@ const docTemplate = `{
                 "ProviderGithub"
             ]
         },
+        "models.RefreshTokenResponse": {
+            "type": "object",
+            "properties": {
+                "access_token": {
+                    "type": "string"
+                }
+            }
+        },
         "models.RegisterRequest": {
             "type": "object",
             "required": [
@@ -704,24 +721,7 @@ const docTemplate = `{
                 }
             }
         },
-        "models.Role": {
-            "type": "object",
-            "required": [
-                "id"
-            ],
-            "properties": {
-                "description": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "name": {
-                    "type": "string"
-                }
-            }
-        },
-        "models.RolePermissions": {
+        "models.RoleWithPermissions": {
             "type": "object",
             "required": [
                 "id"
@@ -744,7 +744,7 @@ const docTemplate = `{
                 }
             }
         },
-        "models.UpdateRolePermissionsRequest": {
+        "models.UpdateRoleRequest": {
             "type": "object",
             "required": [
                 "id"

@@ -5,11 +5,13 @@ package views
 
 //lint:file-ignore SA4006 This context is only used if a nested component is present.
 
-import "github.com/a-h/templ"
-import templruntime "github.com/a-h/templ/runtime"
+import (
+	"dev-go-apis/internal/models"
+	"dev-go-apis/internal/views/components"
 
-import "dev-go-apis/internal/views/components"
-import "dev-go-apis/internal/models"
+	"github.com/a-h/templ"
+	templruntime "github.com/a-h/templ/runtime"
+)
 
 func Index() templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
@@ -60,7 +62,7 @@ func Index() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = components.Feature(models.IntermediateStatus, "HMAC signature middleware").Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = components.Feature(models.CheckStatus, "HMAC signature middleware (SHA256)").Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

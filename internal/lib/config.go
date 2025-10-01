@@ -29,6 +29,6 @@ var (
 	// Secret
 	ACCESS_TOKEN_SECRET  = GetEnvString("ACCESS_TOKEN_SECRET", "@secret123")
 	REFRESH_TOKEN_SECRET = GetEnvString("REFRESH_TOKEN_SECRET", "@secret123")
-	ACCESS_TOKEN_TTL     = GetEnvString("ACCESS_TOKEN_TTL", "15m")
+	ACCESS_TOKEN_TTL     = GetEnvString("ACCESS_TOKEN_TTL", "30m")
 	REFRESH_TOKEN_TTL    = GetEnvString("REFRESH_TOKEN_TTL", "7d")
 )

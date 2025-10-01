@@ -68,7 +68,7 @@ func (s *AuthService) GenerateJwtTokens(userWithClaims *models.UserWithClaims) (
 	}, nil
 }
 
-func (s *AuthService) LoginWithGoogle(googleUserInfo *models.GoogleUserInfo) (*models.User, error) {
+func (s *AuthService) LoginWithGoogle(googleUserInfo *models.GoogleAccountInfo) (*models.User, error) {
 	user := &models.User{
 		Name:          fmt.Sprintf("%s %s", googleUserInfo.FamilyName, googleUserInfo.GivenName),
 		Email:         googleUserInfo.Email,

@@ -3,12 +3,14 @@ package auth
 import (
 	"context"
 	"dev-go-apis/internal/lib"
+	"dev-go-apis/internal/middleware"
 	"dev-go-apis/internal/models"
 	"encoding/json"
 	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"golang.org/x/oauth2"
 )
 
@@ -18,11 +20,12 @@ type IAuthService interface {
 	GenerateJwtTokens(userWithClaims *models.UserWithClaims) (*models.JwtTokens, error)
 	GenerateOAuthState(prefix string) (string, error)
 	CheckOAuthState(state string) (bool, error)
-	LoginWithGoogle(user *models.GoogleUserInfo) (*models.User, error)
+	LoginWithGoogle(user *models.GoogleAccountInfo) (*models.User, error)
 }
 
 type ISessionService interface {
 	CreateSession(session *models.Session) (*models.Session, error)
+	GetSessionById(id uuid.UUID) (*models.Session, error)
 }
 
 type AuthController struct {
@@ -41,8 +44,44 @@ func (contl *AuthController) RegisterRoutes(rg *gin.RouterGroup) {
 	authGroup := rg.Group("/auth")
 	authGroup.POST("/register", contl.Register)
 	authGroup.POST("/login", contl.Login)
+	authGroup.GET("/refresh-token", middleware.RefreshTokenHandler(), contl.RefreshToken)
 	authGroup.GET("/google", contl.LoginWithGoogle)
 	authGroup.GET("/google/callback", contl.GoogleCallback)
+}
+
+// RefreshToken godoc
+//
+//	@Summary	Refresh token
+//	@Tags		Auth
+//	@Accept		json
+//	@Produce	json
+//	@Success	200	{object}	models.APIResponse{data=models.RefreshTokenResponse}
+//	@Router		/auth/refresh-token [get]
+func (contl *AuthController) RefreshToken(ctx *gin.Context) {
+	userWithClaims := ctx.MustGet("user").(*models.UserWithClaims)
+
+	session, err := contl.SessionService.GetSessionById(userWithClaims.SessionID)
+	if err != nil {
+		lib.SendErrorResponse(ctx, lib.InternalServerError.WithStack(err.Error()))
+		return
+	}
+
+	if session == nil {
+		lib.SendErrorResponse(ctx, lib.UnauthorizedError)
+	}
+
+	tokens, err := contl.AuthService.GenerateJwtTokens(&models.UserWithClaims{
+		User:      userWithClaims.User,
+		SessionID: userWithClaims.SessionID,
+	})
+	if err != nil {
+		lib.SendErrorResponse(ctx, lib.InternalServerError.WithStack(err.Error()))
+		return
+	}
+
+	lib.SendSucceedResponse(ctx, &models.RefreshTokenResponse{
+		AccessToken: tokens.AccessToken,
+	})
 }
 
 // LoginWithGoogle godoc
@@ -51,11 +90,12 @@ func (contl *AuthController) RegisterRoutes(rg *gin.RouterGroup) {
 //	@Tags		Auth
 //	@Accept		json
 //	@Produce	json
-//	@Router		/google [get]
+//	@Router		/auth/google [get]
 func (contl *AuthController) LoginWithGoogle(ctx *gin.Context) {
 	state, err := contl.AuthService.GenerateOAuthState(lib.GoogleStatePrefix)
 	if err != nil {
 		lib.SendErrorResponse(ctx, lib.InternalServerError.WithStack(err.Error()))
+		return
 	}
 	url := lib.GoogleOAuthConfig.AuthCodeURL(state, oauth2.AccessTypeOffline)
 	ctx.Redirect(http.StatusTemporaryRedirect, url)
@@ -68,7 +108,7 @@ func (contl *AuthController) LoginWithGoogle(ctx *gin.Context) {
 //	@Accept		json
 //	@Produce	json
 //	@Success	200	{object}	models.APIResponse
-//	@Router		/google/callback [get]
+//	@Router		/auth/google/callback [get]
 func (contl *AuthController) GoogleCallback(ctx *gin.Context) {
 	state := ctx.Query("state")
 	if _, err := contl.AuthService.CheckOAuthState(state); err != nil {
@@ -91,12 +131,12 @@ func (contl *AuthController) GoogleCallback(ctx *gin.Context) {
 	}
 	defer resp.Body.Close()
 
-	var googleUserInfo models.GoogleUserInfo
-	if err := json.NewDecoder(resp.Body).Decode(&googleUserInfo); err != nil {
+	var googleAccountInfo *models.GoogleAccountInfo
+	if err := json.NewDecoder(resp.Body).Decode(googleAccountInfo); err != nil {
 		log.Fatal(err)
 	}
 
-	user, err := contl.AuthService.LoginWithGoogle(&googleUserInfo)
+	user, err := contl.AuthService.LoginWithGoogle(googleAccountInfo)
 	if err != nil {
 		lib.SendErrorResponse(ctx, lib.InternalServerError.WithStack(err.Error()))
 		return

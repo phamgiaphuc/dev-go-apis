@@ -3,15 +3,16 @@ package role
 import (
 	"dev-go-apis/internal/models"
 	"fmt"
+	"log"
 	"time"
 )
 
 type IRoleRepository interface {
-	GetRolePermissionsList() (*models.RolePermissionsList, error)
-	CreateRole(role *models.Role) (*models.Role, error)
-	GetRolePermissionsByID(role *models.Role) (*models.RolePermissions, error)
-	UpdateRolePermissionsByID(rolePermissions *models.RolePermissions) (*models.RolePermissions, error)
-	DeleteRolePermissions(roleIds *models.RoleIDs) error
+	GetRoleList() (*models.RoleList, error)
+	CreateRole(roleWithPermissions *models.RoleWithPermissions) (*models.RoleWithPermissions, error)
+	UpdateRoleById(roleWithPermissions *models.RoleWithPermissions) (*models.RoleWithPermissions, error)
+	DeleteRole(roleIds *models.RoleIDs) error
+	GetRoleById(roleWithPermissions *models.RoleWithPermissions) (*models.RoleWithPermissions, error)
 }
 
 type ICacheRepository interface {
@@ -30,32 +31,27 @@ func NewRoleService(roleRepo IRoleRepository, cacheRepo ICacheRepository) *RoleS
 	}
 }
 
-func (s *RoleService) DeleteRolePermissions(req *models.DeleteRolePermissionsRequest) error {
-	return s.RoleRepository.DeleteRolePermissions(&req.RoleIDs)
+func (s *RoleService) DeleteRole(req *models.DeleteRolesRequest) error {
+	return s.RoleRepository.DeleteRole(&req.RoleIDs)
 }
 
-func (s *RoleService) GetRolePermissionsList() (*models.RolePermissionsList, error) {
-	list, err := s.RoleRepository.GetRolePermissionsList()
+func (s *RoleService) GetRoleList() (*models.RoleList, error) {
+	list, err := s.RoleRepository.GetRoleList()
 	if err != nil {
 		return nil, err
-	}
-	for i := range *list {
-		role := &(*list)[i]
-		role.PermissionIDs = make([]int, len(role.Permissions))
-		for j, p := range role.Permissions {
-			role.PermissionIDs[j] = p.ID
-		}
 	}
 	return list, nil
 }
 
-func (s *RoleService) CreateRole(req *models.CreateRoleRequest) (*models.Role, error) {
-	role := &models.Role{
-		Name:        req.Name,
-		Description: req.Description,
+func (s *RoleService) CreateRole(req *models.CreateRoleRequest) (*models.RoleWithPermissions, error) {
+	roleWithPermissions := &models.RoleWithPermissions{
+		Role: models.Role{
+			Name:        req.Name,
+			Description: req.Description,
+		},
 	}
 
-	role, err := s.RoleRepository.CreateRole(role)
+	role, err := s.RoleRepository.CreateRole(roleWithPermissions)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create a role: %s", err.Error())
 	}
@@ -63,25 +59,24 @@ func (s *RoleService) CreateRole(req *models.CreateRoleRequest) (*models.Role, e
 	return role, nil
 }
 
-func (s *RoleService) GetRolePermissionsByID(id int) (*models.RolePermissions, error) {
-	role := &models.Role{
-		ID: id,
+func (s *RoleService) GetRoleById(req *models.GetRoleByIdRequest) (*models.RoleWithPermissions, error) {
+	roleWithPermissions := &models.RoleWithPermissions{
+		Role: models.Role{
+			ID: req.ID,
+		},
 	}
-	rolePermissions, err := s.RoleRepository.GetRolePermissionsByID(role)
+	_, err := s.RoleRepository.GetRoleById(roleWithPermissions)
 	if err != nil {
+		log.Printf("%v\n", err.Error())
 		return nil, err
 	}
-	rolePermissions.PermissionIDs = make([]int, len(rolePermissions.Permissions))
-	for j, p := range rolePermissions.Permissions {
-		rolePermissions.PermissionIDs[j] = p.ID
-	}
-	return rolePermissions, nil
+	return roleWithPermissions, nil
 }
 
-func (s *RoleService) UpdateRolePermissionsByID(req *models.UpdateRolePermissionsRequest) (*models.RolePermissions, error) {
-	rolePermissions := &models.RolePermissions{
+func (s *RoleService) UpdateRoleById(req *models.UpdateRoleRequest) (*models.RoleWithPermissions, error) {
+	roleWithPermissions := &models.RoleWithPermissions{
 		Role:          req.Role,
 		PermissionIDs: req.PermissionIDs,
 	}
-	return s.RoleRepository.UpdateRolePermissionsByID(rolePermissions)
+	return s.RoleRepository.UpdateRoleById(roleWithPermissions)
 }

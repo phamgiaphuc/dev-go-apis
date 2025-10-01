@@ -2,18 +2,18 @@ package role
 
 import (
 	"dev-go-apis/internal/lib"
+	"dev-go-apis/internal/middleware"
 	"dev-go-apis/internal/models"
-	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
 
 type IRoleService interface {
-	GetRolePermissionsList() (*models.RolePermissionsList, error)
-	CreateRole(req *models.CreateRoleRequest) (*models.Role, error)
-	GetRolePermissionsByID(id int) (*models.RolePermissions, error)
-	UpdateRolePermissionsByID(req *models.UpdateRolePermissionsRequest) (*models.RolePermissions, error)
-	DeleteRolePermissions(req *models.DeleteRolePermissionsRequest) error
+	GetRoleList() (*models.RoleList, error)
+	CreateRole(req *models.CreateRoleRequest) (*models.RoleWithPermissions, error)
+	UpdateRoleById(req *models.UpdateRoleRequest) (*models.RoleWithPermissions, error)
+	DeleteRole(req *models.DeleteRolesRequest) error
+	GetRoleById(req *models.GetRoleByIdRequest) (*models.RoleWithPermissions, error)
 }
 
 type RoleController struct {
@@ -28,99 +28,11 @@ func NewRoleController(roleService IRoleService) *RoleController {
 
 func (contl *RoleController) RegisterRoutes(rg *gin.RouterGroup) {
 	roleGroup := rg.Group("/roles")
-	roleGroup.GET("/", contl.GetRolePermissionsList)
-	roleGroup.POST("/", contl.CreateRole)
-	roleGroup.PUT("/", contl.UpdateRolePermissions)
-	roleGroup.DELETE("/", contl.DeleteRolePermissions)
-	roleGroup.GET("/:id", contl.GetRolePermissionsById)
-}
-
-// DeleteRolePermissions godoc
-//
-//	@Summary		Delete roles
-//	@Description	Remove roles
-//	@Tags			Role
-//	@Accept			json
-//	@Produce		json
-//	@Param			body	body		models.DeleteRolePermissionsRequest	true	"Delete roles request"
-//	@Success		200		{object}	models.APIResponse
-//	@Failure		400		{object}	models.APIResponse
-//	@Failure		500		{object}	models.APIResponse
-//	@Router			/roles [delete]
-//	@Security		Bearer
-func (contl *RoleController) DeleteRolePermissions(ctx *gin.Context) {
-	var req models.DeleteRolePermissionsRequest
-
-	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.Error(lib.InvalidBodyRequestError.WithStack(err.Error()))
-		return
-	}
-
-	err := contl.RoleService.DeleteRolePermissions(&req)
-	if err != nil {
-		ctx.Error(lib.InternalServerError.WithStack(err.Error()))
-		return
-	}
-
-	lib.SendSucceedResponse(ctx, nil)
-}
-
-// UpdateRolePermissions godoc
-//
-//	@Summary	Update a role
-//	@Tags		Role
-//	@Accept		json
-//	@Produce	json
-//	@Param		body	body		models.UpdateRolePermissionsRequest	true	"Role update request"
-//	@Success	200		{object}	models.APIResponse{data=models.RolePermissions}
-//	@Failure	400		{object}	models.APIResponse
-//	@Failure	500		{object}	models.APIResponse
-//	@Router		/roles [put]
-//	@Security	Bearer
-func (contl *RoleController) UpdateRolePermissions(ctx *gin.Context) {
-	var req models.UpdateRolePermissionsRequest
-
-	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.Error(lib.InvalidBodyRequestError.WithStack(err.Error()))
-		return
-	}
-
-	rolePermissions, err := contl.RoleService.UpdateRolePermissionsByID(&req)
-	if err != nil {
-		ctx.Error(lib.InternalServerError.WithStack(err.Error()))
-		return
-	}
-
-	lib.SendSucceedResponse(ctx, rolePermissions)
-}
-
-// GetRoleListById godoc
-//
-//	@Summary	Get role by ID
-//	@Tags		Role
-//	@Accept		json
-//	@Produce	json
-//	@Param		id	path		int	true	"Role ID"
-//	@Success	200	{object}	models.APIResponse{data=models.RolePermissions}
-//	@Failure	400	{object}	models.APIResponse
-//	@Failure	500	{object}	models.APIResponse
-//	@Router		/roles/{id} [get]
-//	@Security	Bearer
-func (contl *RoleController) GetRolePermissionsById(ctx *gin.Context) {
-	var req models.GetRolePermissionsByIdRequest
-
-	if err := ctx.ShouldBindUri(&req); err != nil {
-		ctx.Error(lib.InvalidParamRequestError.WithStack(err.Error()))
-		return
-	}
-
-	rolePermissions, err := contl.RoleService.GetRolePermissionsByID(req.ID)
-	if err != nil {
-		ctx.Error(lib.InternalServerError.WithStack(err.Error()))
-		return
-	}
-
-	lib.SendSucceedResponse(ctx, rolePermissions)
+	roleGroup.GET("", middleware.ApiHmacHandler(), contl.GetRoleList)
+	roleGroup.POST("", contl.CreateRole)
+	roleGroup.PUT("", contl.UpdateRole)
+	roleGroup.DELETE("", contl.DeleteRole)
+	roleGroup.GET("/:id", contl.GetRoleById)
 }
 
 // GetRoleList godoc
@@ -128,16 +40,14 @@ func (contl *RoleController) GetRolePermissionsById(ctx *gin.Context) {
 //	@Summary	Get list of roles
 //	@Tags		Role
 //	@Produce	json
-//	@Success	200	{object}	models.APIResponse{data=models.RolePermissionsList}
+//	@Success	200	{object}	models.APIResponse{data=models.RoleList}
 //	@Failure	400	{object}	models.APIResponse
 //	@Failure	500	{object}	models.APIResponse
 //	@Router		/roles [get]
-func (contl *RoleController) GetRolePermissionsList(ctx *gin.Context) {
-	roleList, err := contl.RoleService.GetRolePermissionsList()
+func (contl *RoleController) GetRoleList(ctx *gin.Context) {
+	roleList, err := contl.RoleService.GetRoleList()
 	if err != nil {
-		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
-		})
+		lib.SendErrorResponse(ctx, lib.InternalServerError)
 		return
 	}
 
@@ -151,11 +61,10 @@ func (contl *RoleController) GetRolePermissionsList(ctx *gin.Context) {
 //	@Accept		json
 //	@Produce	json
 //	@Param		body	body		models.CreateRoleRequest	true	"Role creation request"
-//	@Success	200		{object}	models.APIResponse{data=models.Role}
+//	@Success	200		{object}	models.APIResponse{data=models.RoleWithPermissions}
 //	@Failure	400		{object}	models.APIResponse
 //	@Failure	500		{object}	models.APIResponse
 //	@Router		/roles [post]
-//	@Security	Bearer
 func (contl *RoleController) CreateRole(ctx *gin.Context) {
 	var req models.CreateRoleRequest
 
@@ -164,12 +73,95 @@ func (contl *RoleController) CreateRole(ctx *gin.Context) {
 		return
 	}
 
-	role, err := contl.RoleService.CreateRole(&req)
+	roleWithPermissions, err := contl.RoleService.CreateRole(&req)
 	if err != nil {
 		ctx.Error(lib.InternalServerError.WithStack(err.Error()))
 		return
 	}
 
-	lib.SendSucceedResponse(ctx, role)
+	lib.SendSucceedResponse(ctx, roleWithPermissions)
+}
 
+// UpdateRole godoc
+//
+//	@Summary	Update a role
+//	@Tags		Role
+//	@Accept		json
+//	@Produce	json
+//	@Param		body	body		models.UpdateRoleRequest	true	"Role update request"
+//	@Success	200		{object}	models.APIResponse{data=models.RoleWithPermissions}
+//	@Failure	400		{object}	models.APIResponse
+//	@Failure	500		{object}	models.APIResponse
+//	@Router		/roles [put]
+func (contl *RoleController) UpdateRole(ctx *gin.Context) {
+	var req models.UpdateRoleRequest
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.Error(lib.InvalidBodyRequestError.WithStack(err.Error()))
+		return
+	}
+
+	roleWithPermissions, err := contl.RoleService.UpdateRoleById(&req)
+	if err != nil {
+		ctx.Error(lib.InternalServerError.WithStack(err.Error()))
+		return
+	}
+
+	lib.SendSucceedResponse(ctx, roleWithPermissions)
+}
+
+// DeleteRole godoc
+//
+//	@Summary		Delete roles
+//	@Description	Remove roles
+//	@Tags			Role
+//	@Accept			json
+//	@Produce		json
+//	@Param			body	body		models.DeleteRolesRequest	true	"Delete roles request"
+//	@Success		200		{object}	models.APIResponse
+//	@Failure		400		{object}	models.APIResponse
+//	@Failure		500		{object}	models.APIResponse
+//	@Router			/roles [delete]
+func (contl *RoleController) DeleteRole(ctx *gin.Context) {
+	var req models.DeleteRolesRequest
+
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.Error(lib.InvalidBodyRequestError.WithStack(err.Error()))
+		return
+	}
+
+	err := contl.RoleService.DeleteRole(&req)
+	if err != nil {
+		ctx.Error(lib.InternalServerError.WithStack(err.Error()))
+		return
+	}
+
+	lib.SendSucceedResponse(ctx, nil)
+}
+
+// GetRoleById godoc
+//
+//	@Summary	Get role by ID
+//	@Tags		Role
+//	@Accept		json
+//	@Produce	json
+//	@Param		id	path		int	true	"Role ID"
+//	@Success	200	{object}	models.APIResponse{data=models.RoleWithPermissions}
+//	@Failure	400	{object}	models.APIResponse
+//	@Failure	500	{object}	models.APIResponse
+//	@Router		/roles/{id} [get]
+func (contl *RoleController) GetRoleById(ctx *gin.Context) {
+	var req models.GetRoleByIdRequest
+
+	if err := ctx.ShouldBindUri(&req); err != nil {
+		ctx.Error(lib.InvalidParamRequestError.WithStack(err.Error()))
+		return
+	}
+
+	roleWithPermissions, err := contl.RoleService.GetRoleById(&req)
+	if err != nil {
+		ctx.Error(lib.InternalServerError.WithStack(err.Error()))
+		return
+	}
+
+	lib.SendSucceedResponse(ctx, roleWithPermissions)
 }

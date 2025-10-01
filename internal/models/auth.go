@@ -24,3 +24,7 @@ type LoginResponse struct {
 type RegisterResponse struct {
 	User `json:",inline"`
 }
+
+type RefreshTokenResponse struct {
+	AccessToken string `json:"access_token"`
+}

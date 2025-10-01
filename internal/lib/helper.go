@@ -1,7 +1,10 @@
 package lib
 
 import (
+	"crypto/hmac"
 	"crypto/rand"
+	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
 	"math"
 	"math/big"
@@ -33,8 +36,17 @@ func ParseTimeDuration(value string, def int, unit time.Duration) time.Duration 
 
 	return time.Duration(def) * unit
 }
+
 func ParseExpiredTime(unit time.Duration) time.Time {
 	return time.Now().Add(unit)
+}
+
+func ParseUnixTime(timestamp string) (time.Time, error) {
+	ts, err := strconv.ParseInt(timestamp, 10, 64)
+	if err != nil {
+		return time.Time{}, err
+	}
+	return time.Unix(ts, 0).UTC(), nil
 }
 
 func GenerateOTP(maxDigits uint32) string {
@@ -46,4 +58,16 @@ func GenerateOTP(maxDigits uint32) string {
 		panic(err)
 	}
 	return fmt.Sprintf("%0*d", maxDigits, bi)
+}
+
+func GenerateSHA256(input, secret string) string {
+	h := hmac.New(sha256.New, []byte(secret))
+	if _, err := h.Write([]byte(input)); err != nil {
+		return ""
+	}
+	return hex.EncodeToString(h.Sum(nil))
+}
+
+func CompareSHA256(clientSignature, serverSignature string) bool {
+	return hmac.Equal([]byte(clientSignature), []byte(serverSignature))
 }
