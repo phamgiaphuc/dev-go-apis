@@ -2,7 +2,6 @@ package role
 
 import (
 	"fmt"
-	"log"
 	"time"
 
 	"dev-go-apis/internal/models"
@@ -18,6 +17,8 @@ type IRoleRepository interface {
 
 type ICacheRepository interface {
 	SetValue(string, interface{}, time.Duration) error
+	GetValue(string, interface{}) error
+	GetKeys(string) ([]string, error)
 }
 
 type RoleService struct {
@@ -68,7 +69,6 @@ func (s *RoleService) GetRoleById(req *models.GetRoleByIdRequest) (*models.RoleW
 	}
 	_, err := s.RoleRepository.GetRoleById(roleWithPermissions)
 	if err != nil {
-		log.Printf("%v\n", err.Error())
 		return nil, err
 	}
 	return roleWithPermissions, nil

@@ -20,7 +20,7 @@ type IUserRepository interface {
 
 type ICacheRepository interface {
 	SetValue(string, interface{}, time.Duration) error
-	GetValue(string) (string, error)
+	GetValue(string, interface{}) error
 	DeleteValue(keys ...string) (bool, error)
 }
 
@@ -37,7 +37,8 @@ func NewAuthService(userRepo IUserRepository, cacheRepo ICacheRepository) *AuthS
 }
 
 func (s *AuthService) CheckOAuthState(state string) (bool, error) {
-	_, err := s.CacheRepo.GetValue(state)
+	var value int
+	err := s.CacheRepo.GetValue(state, &value)
 	if err != nil {
 		return false, fmt.Errorf("failed to get oauth state: %s", err.Error())
 	}

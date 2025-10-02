@@ -5,4 +5,5 @@ type APIResponse struct {
 	Data    interface{} `json:"data,omitempty"`
 	Message string      `json:"message,omitempty"`
 	Stack   string      `json:"stack,omitempty"`
+	Errors  interface{} `json:"errors,omitempty"`
 }

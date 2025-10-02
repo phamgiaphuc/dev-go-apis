@@ -13,6 +13,14 @@ import (
 	"time"
 )
 
+const (
+	TIME_1_DAY      = time.Hour * 24
+	TIME_12_HOURS   = time.Hour * 12
+	TIME_5_MINUTES  = time.Minute * 5
+	TIME_10_MINUTES = time.Minute * 10
+	TIME_30_MINUTES = time.Minute * 30
+)
+
 func ParseTimeDuration(value string, def int, unit time.Duration) time.Duration {
 	if duration, err := time.ParseDuration(value); err == nil {
 		return duration

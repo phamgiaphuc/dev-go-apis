@@ -104,7 +104,12 @@ func (repo *RoleRepository) GetRoleById(roleWithPermissions *models.RoleWithPerm
 			ARRAY_AGG(
 				p.id
 			) FILTER (WHERE p.id IS NOT NULL), '{}'
-		) AS permission_ids
+		) AS permission_ids,
+		COALESCE(
+			ARRAY_AGG(
+				p.name
+			) FILTER (WHERE p.name IS NOT NULL), '{}'
+		) AS permissions
 		FROM roles r
 		LEFT JOIN role_permissions rp ON rp.role_id = r.id
 		LEFT JOIN permissions p ON p.id = rp.permission_id
@@ -144,7 +149,12 @@ func (repo *RoleRepository) GetRoleList() (*models.RoleList, error) {
 			ARRAY_AGG(
 				p.id
 			) FILTER (WHERE p.id IS NOT NULL), '{}'
-		) AS permission_ids
+		) AS permission_ids,
+		COALESCE(
+			ARRAY_AGG(
+				p.name
+			) FILTER (WHERE p.name IS NOT NULL), '{}'
+		) AS permissions
 		FROM roles r
 		LEFT JOIN role_permissions rp ON rp.role_id = r.id
 		LEFT JOIN permissions p ON p.id = rp.permission_id

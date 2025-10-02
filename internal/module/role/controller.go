@@ -2,7 +2,6 @@ package role
 
 import (
 	"dev-go-apis/internal/lib"
-	"dev-go-apis/internal/middleware"
 	"dev-go-apis/internal/models"
 
 	"github.com/gin-gonic/gin"
@@ -28,7 +27,7 @@ func NewRoleController(roleService IRoleService) *RoleController {
 
 func (contl *RoleController) RegisterRoutes(rg *gin.RouterGroup) {
 	roleGroup := rg.Group("/roles")
-	roleGroup.GET("", middleware.ApiHmacHandler(), contl.GetRoleList)
+	roleGroup.GET("", contl.GetRoleList)
 	roleGroup.POST("", contl.CreateRole)
 	roleGroup.PUT("", contl.UpdateRole)
 	roleGroup.DELETE("", contl.DeleteRole)
@@ -38,7 +37,7 @@ func (contl *RoleController) RegisterRoutes(rg *gin.RouterGroup) {
 // GetRoleList godoc
 //
 //	@Summary	Get list of roles
-//	@Tags		Role
+//	@Tags		Role & Permission
 //	@Produce	json
 //	@Success	200	{object}	models.APIResponse{data=models.RoleList}
 //	@Failure	400	{object}	models.APIResponse
@@ -47,7 +46,7 @@ func (contl *RoleController) RegisterRoutes(rg *gin.RouterGroup) {
 func (contl *RoleController) GetRoleList(ctx *gin.Context) {
 	roleList, err := contl.RoleService.GetRoleList()
 	if err != nil {
-		lib.SendErrorResponse(ctx, lib.InternalServerError)
+		lib.SendErrorResponse(ctx, lib.InternalServerError.WithStack(err.Error()))
 		return
 	}
 
@@ -57,7 +56,7 @@ func (contl *RoleController) GetRoleList(ctx *gin.Context) {
 // CreateRole godoc
 //
 //	@Summary	Create a new role
-//	@Tags		Role
+//	@Tags		Role & Permission
 //	@Accept		json
 //	@Produce	json
 //	@Param		body	body		models.CreateRoleRequest	true	"Role creation request"
@@ -85,7 +84,7 @@ func (contl *RoleController) CreateRole(ctx *gin.Context) {
 // UpdateRole godoc
 //
 //	@Summary	Update a role
-//	@Tags		Role
+//	@Tags		Role & Permission
 //	@Accept		json
 //	@Produce	json
 //	@Param		body	body		models.UpdateRoleRequest	true	"Role update request"
@@ -113,7 +112,7 @@ func (contl *RoleController) UpdateRole(ctx *gin.Context) {
 //
 //	@Summary		Delete roles
 //	@Description	Remove roles
-//	@Tags			Role
+//	@Tags			Role & Permission
 //	@Accept			json
 //	@Produce		json
 //	@Param			body	body		models.DeleteRolesRequest	true	"Delete roles request"
@@ -141,7 +140,7 @@ func (contl *RoleController) DeleteRole(ctx *gin.Context) {
 // GetRoleById godoc
 //
 //	@Summary	Get role by ID
-//	@Tags		Role
+//	@Tags		Role & Permission
 //	@Accept		json
 //	@Produce	json
 //	@Param		id	path		int	true	"Role ID"

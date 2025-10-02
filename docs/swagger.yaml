@@ -3,6 +3,7 @@ definitions:
   models.APIResponse:
     properties:
       data: {}
+      errors: {}
       message:
         type: string
       stack:
@@ -87,6 +88,7 @@ definitions:
       name:
         type: string
       password:
+        minLength: 6
         type: string
     required:
     - email
@@ -202,6 +204,30 @@ info:
   title: Dev Go APIs
   version: v1.0.0
 paths:
+  /auth/google:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses: {}
+      summary: Log in with Google
+      tags:
+      - Auth
+  /auth/google/callback:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+      summary: Google callback
+      tags:
+      - Auth
   /auth/login:
     post:
       consumes:
@@ -281,30 +307,6 @@ paths:
       summary: Register a new user
       tags:
       - Auth
-  /google:
-    get:
-      consumes:
-      - application/json
-      produces:
-      - application/json
-      responses: {}
-      summary: Log in with Google
-      tags:
-      - Auth
-  /google/callback:
-    get:
-      consumes:
-      - application/json
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.APIResponse'
-      summary: Google callback
-      tags:
-      - Auth
   /permissions:
     get:
       produces:
@@ -316,7 +318,7 @@ paths:
             $ref: '#/definitions/models.APIResponse'
       summary: Get list of permissions by group
       tags:
-      - Permission
+      - Role & Permission
   /roles:
     delete:
       consumes:
@@ -346,7 +348,7 @@ paths:
             $ref: '#/definitions/models.APIResponse'
       summary: Delete roles
       tags:
-      - Role
+      - Role & Permission
     get:
       produces:
       - application/json
@@ -372,7 +374,7 @@ paths:
             $ref: '#/definitions/models.APIResponse'
       summary: Get list of roles
       tags:
-      - Role
+      - Role & Permission
     post:
       consumes:
       - application/json
@@ -405,7 +407,7 @@ paths:
             $ref: '#/definitions/models.APIResponse'
       summary: Create a new role
       tags:
-      - Role
+      - Role & Permission
     put:
       consumes:
       - application/json
@@ -438,7 +440,7 @@ paths:
             $ref: '#/definitions/models.APIResponse'
       summary: Update a role
       tags:
-      - Role
+      - Role & Permission
   /roles/{id}:
     get:
       consumes:
@@ -471,7 +473,7 @@ paths:
             $ref: '#/definitions/models.APIResponse'
       summary: Get role by ID
       tags:
-      - Role
+      - Role & Permission
   /users/{id}:
     get:
       consumes:
@@ -494,6 +496,8 @@ paths:
                 data:
                   $ref: '#/definitions/models.UserWithAccounts'
               type: object
+      security:
+      - Bearer: []
       summary: Get user by ID
       tags:
       - User

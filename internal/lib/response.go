@@ -19,9 +19,10 @@ func SendErrorResponse(ctx *gin.Context, err *models.APIError) {
 	resp := &models.APIResponse{
 		Success: false,
 		Message: err.Message,
+		Errors:  err.Errors,
 	}
 	if GIN_MODE != gin.ReleaseMode {
-		resp.Stack = err.GetStack()
+		resp.Stack = err.Stack
 	}
 	ctx.AbortWithStatusJSON(err.Code, resp)
 }

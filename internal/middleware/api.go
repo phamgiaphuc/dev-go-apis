@@ -70,7 +70,7 @@ func ApiRateLimiterHandler(limiter *redis_rate.Limiter) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		key := ctx.ClientIP()
 
-		res, err := limiter.Allow(ctx, key, redis_rate.PerMinute(20))
+		res, err := limiter.Allow(ctx, key, redis_rate.PerMinute(10))
 		if err != nil {
 			lib.SendErrorResponse(ctx, lib.InternalServerError)
 			return

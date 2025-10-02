@@ -78,7 +78,7 @@ func (r *Router) InitRoutes() http.Handler {
 	 */
 	cacheService := cache.NewCacheService(cacheRepo)
 	authService := auth.NewAuthService(userRepo, cacheRepo)
-	userService := user.NewUserService(userRepo)
+	userService := user.NewUserService(userRepo, roleRepo)
 	sessionService := session.NewSessionService(sessionRepo)
 	permissionService := permission.NewPermissionService(permissionRepo)
 	roleService := role.NewRoleService(roleRepo, cacheRepo)

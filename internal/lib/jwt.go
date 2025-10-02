@@ -16,7 +16,7 @@ var (
 func SignAccessToken(payload *models.UserWithClaims) (string, error) {
 	now := time.Now()
 	claims := models.UserWithClaims{
-		User:      payload.User,
+		UserID:    payload.UserID,
 		SessionID: payload.SessionID,
 		RegisteredClaims: jwt.RegisteredClaims{
 			IssuedAt:  jwt.NewNumericDate(now),
@@ -30,7 +30,7 @@ func SignAccessToken(payload *models.UserWithClaims) (string, error) {
 func SignRefreshToken(payload *models.UserWithClaims) (string, error) {
 	now := time.Now()
 	claims := models.UserWithClaims{
-		User:      payload.User,
+		UserID:    payload.UserID,
 		SessionID: payload.SessionID,
 		RegisteredClaims: jwt.RegisteredClaims{
 			IssuedAt:  jwt.NewNumericDate(now),

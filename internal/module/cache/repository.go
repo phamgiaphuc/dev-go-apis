@@ -2,6 +2,7 @@ package cache
 
 import (
 	"context"
+	"encoding/json"
 	"time"
 
 	"github.com/redis/go-redis/v9"
@@ -21,14 +22,42 @@ func (repo *CacheRepository) SetValue(key string, value interface{}, expiration 
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	return repo.CacheClient.Set(ctx, key, value, expiration).Err()
+	data, err := json.Marshal(value)
+	if err != nil {
+		return err
+	}
+
+	return repo.CacheClient.Set(ctx, key, data, expiration).Err()
 }
 
-func (repo *CacheRepository) GetValue(key string) (string, error) {
+func (repo *CacheRepository) GetKeys(pattern string) ([]string, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	return repo.CacheClient.Get(ctx, key).Result()
+	var keys []string
+
+	iter := repo.CacheClient.Scan(ctx, 0, pattern, 0).Iterator()
+	for iter.Next(ctx) {
+		keys = append(keys, iter.Val())
+	}
+
+	if err := iter.Err(); err != nil {
+		return nil, err
+	}
+
+	return keys, nil
+}
+
+func (repo *CacheRepository) GetValue(key string, dest interface{}) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	val, err := repo.CacheClient.Get(ctx, key).Bytes()
+	if err != nil {
+		return err
+	}
+
+	return json.Unmarshal(val, dest)
 }
 
 func (repo *CacheRepository) DeleteValue(keys ...string) (bool, error) {

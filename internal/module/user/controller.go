@@ -16,6 +16,7 @@ import (
 type IUserService interface {
 	GetUserByID(id uuid.UUID) (*models.UserWithAccounts, error)
 	GetUserPermissionsByRoleID(roleID int) ([]models.Permission, error)
+	CheckUserRole(uuid.UUID, []string) (bool, error)
 }
 
 type ICacheService interface {
@@ -23,7 +24,7 @@ type ICacheService interface {
 }
 
 type UserController struct {
-	Service      IUserService
+	UserService  IUserService
 	CacheService ICacheService
 }
 
@@ -31,23 +32,21 @@ type GetUserByIDRequest struct {
 	ID string `uri:"id" binding:"required"`
 }
 
-func NewUserController(service IUserService, cacheService ICacheService) *UserController {
+func NewUserController(userService IUserService, cacheService ICacheService) *UserController {
 	return &UserController{
-		Service:      service,
+		UserService:  userService,
 		CacheService: cacheService,
 	}
 }
 
 func (contl *UserController) RegisterRoutes(rg *gin.RouterGroup) {
 	userGroup := rg.Group("/users")
-	userGroup.GET("/:id", contl.GetUserById)
+	userGroup.Use(middleware.AccessTokenHandler())
+	userGroup.GET("/:id",
+		middleware.PermissionHandler(contl.UserService, lib.GetUserByIdPermissions),
+		contl.GetUserById,
+	)
 	userGroup.GET("/me",
-		middleware.AccessTokenHandler(),
-		middleware.PermissionHandler(
-			contl.Service,
-			contl.CacheService,
-			lib.AdminDashboard,
-		),
 		contl.GetMe,
 	)
 }
@@ -63,10 +62,7 @@ func (contl *UserController) RegisterRoutes(rg *gin.RouterGroup) {
 //	@Security	Bearer
 func (contl *UserController) GetMe(ctx *gin.Context) {
 	userWithClaims := ctx.MustGet("user").(*models.UserWithClaims)
-	lib.SendSucceedResponse(ctx, &models.GetMeResponse{
-		User:      userWithClaims.User,
-		SessionID: userWithClaims.SessionID,
-	})
+	lib.SendSucceedResponse(ctx, userWithClaims)
 }
 
 // GetUserById godoc
@@ -78,6 +74,7 @@ func (contl *UserController) GetMe(ctx *gin.Context) {
 //	@Param		id	path		string	true	"User ID"
 //	@Success	200	{object}	models.APIResponse{data=models.UserWithAccounts}
 //	@Router		/users/{id} [get]
+//	@Security	Bearer
 func (contl *UserController) GetUserById(ctx *gin.Context) {
 	var req GetUserByIDRequest
 
@@ -92,7 +89,7 @@ func (contl *UserController) GetUserById(ctx *gin.Context) {
 		return
 	}
 
-	user, err := contl.Service.GetUserByID(userID)
+	user, err := contl.UserService.GetUserByID(userID)
 	if err != nil {
 		fmt.Printf("Error retrieving user: %v\n", err)
 		ctx.JSON(http.StatusInternalServerError, gin.H{

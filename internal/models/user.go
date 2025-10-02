@@ -32,7 +32,7 @@ type UserWithAccount struct {
 }
 
 type UserWithClaims struct {
-	User      User      `json:"user"`
+	UserID    uuid.UUID `json:"user_id"`
 	SessionID uuid.UUID `json:"session_id"`
 	jwt.RegisteredClaims
 }

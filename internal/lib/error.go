@@ -1,9 +1,14 @@
 package lib
 
 import (
+	"errors"
+	"fmt"
 	"net/http"
+	"strings"
 
 	"dev-go-apis/internal/models"
+
+	"github.com/go-playground/validator/v10"
 )
 
 var (
@@ -24,4 +29,38 @@ var (
 
 func NewAPIError(code int, message, stack string) *models.APIError {
 	return &models.APIError{Code: code, Message: message, Stack: stack}
+}
+
+func GetValidationErrorMsg(fe validator.FieldError) string {
+	switch fe.Tag() {
+	case "email":
+		return "Invalid email format"
+	case "required":
+		return fmt.Sprintf("%s is required", fe.Field())
+	case "lte":
+		return fmt.Sprintf("%s should be less than %s", fe.Field(), fe.Param())
+	case "gte":
+		return fmt.Sprintf("%s should be greater than %s", fe.Field(), fe.Param())
+	case "min":
+		return fmt.Sprintf("%s must be at least %s characters long", fe.Field(), fe.Param())
+	default:
+		return fmt.Sprintf("%s is invalid", fe.Field())
+	}
+}
+
+func ParseValidationErrors(err error) []models.ValidationError {
+	var ve validator.ValidationErrors
+	if !errors.As(err, &ve) {
+		return nil
+	}
+
+	errorsList := make([]models.ValidationError, len(ve))
+	for i, fe := range ve {
+		errorsList[i] = models.ValidationError{
+			Field:   strings.ToLower(fe.Field()),
+			Message: GetValidationErrorMsg(fe),
+		}
+	}
+
+	return errorsList
 }

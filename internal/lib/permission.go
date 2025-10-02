@@ -1,6 +1,8 @@
 package lib
 
-import "fmt"
+import (
+	"fmt"
+)
 
 const (
 	AdminDashboard     = "dashboard:admin"
@@ -37,3 +39,13 @@ func EditPermission(group string) string {
 func DeletePermission(group string) string {
 	return fmt.Sprintf("%s:delete", group)
 }
+
+var (
+	// User APIs
+	GetUserByIdPermissions = []string{
+		ReadUserAdminDashboard,
+		CreateUserAdminDashboard,
+		EditUserAdminDashboard,
+		DeleteUserAdminDashboard,
+	}
+)

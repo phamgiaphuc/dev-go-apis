@@ -30,7 +30,7 @@ func (contl *PermissionController) RegisterRoutes(rg *gin.RouterGroup) {
 // GetPermissionList godoc
 //
 //	@Summary	Get list of permissions by group
-//	@Tags		Permission
+//	@Tags		Role & Permission
 //	@Produce	json
 //	@Success	200	{object}	models.APIResponse
 //	@Router		/permissions [get]

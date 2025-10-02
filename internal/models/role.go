@@ -10,9 +10,19 @@ type Role struct {
 
 type RoleIDs []int
 
+type JSONInt64Array pq.Int64Array
+type JSONStringArray pq.StringArray
+
 type RoleWithPermissions struct {
 	Role          `json:",inline"`
-	PermissionIDs pq.Int64Array `db:"permission_ids" json:"permission_ids" swaggertype:"array,integer"`
+	PermissionIDs pq.Int64Array  `db:"permission_ids" json:"permission_ids" swaggertype:"array,integer"`
+	Permissions   pq.StringArray `db:"permissions" json:"-"`
+}
+
+type RoleWithPermissions2 struct {
+	Role          `json:",inline"`
+	PermissionIDs []int64  `json:"permission_ids" swaggertype:"array,integer"`
+	Permissions   []string `json:"permissions"`
 }
 
 type RoleList []RoleWithPermissions
