@@ -18,6 +18,10 @@ type IUserRepository interface {
 	UpdateUserById(id string, user *models.User) (*models.User, error)
 }
 
+type IAuthRepository interface {
+	CreateVerification(verification *models.Verification) (*models.Verification, error)
+}
+
 type ICacheRepository interface {
 	SetValue(string, interface{}, time.Duration) error
 	GetValue(string, interface{}) error
@@ -27,21 +31,43 @@ type ICacheRepository interface {
 type AuthService struct {
 	UserRepo  IUserRepository
 	CacheRepo ICacheRepository
+	AuthRepo  IAuthRepository
 }
 
-func NewAuthService(userRepo IUserRepository, cacheRepo ICacheRepository) *AuthService {
+func NewAuthService(userRepo IUserRepository, cacheRepo ICacheRepository, authRepo IAuthRepository) *AuthService {
 	return &AuthService{
 		UserRepo:  userRepo,
 		CacheRepo: cacheRepo,
+		AuthRepo:  authRepo,
 	}
 }
 
-func (s *AuthService) GenerateVerificationToken(userVerification *models.UserVerification, duration time.Duration) (*models.JwtUserVerificationToken, error) {
-	token, err := lib.SignVerificationToken(userVerification, duration)
+func (s *AuthService) CreateEmailVerification(verification *models.Verification) (*models.CreateVerification, error) {
+	expiredAt := time.Now().Add(time.Minute * 5)
+	verification.ExpiredAt = expiredAt
+
+	code := lib.GenerateOTP(6)
+	hashCode, err := lib.HashPassword(code)
 	if err != nil {
-		return nil, fmt.Errorf("failed to generate verification token: %s", err.Error())
+		return nil, fmt.Errorf("unable to create value: %s", err.Error())
 	}
-	return token, nil
+	verification.Value = hashCode
+
+	_, err = s.AuthRepo.CreateVerification(verification)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create verification: %s", err.Error())
+	}
+
+	token, err := lib.SignVerificationToken(verification, expiredAt)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create verification token: %s", err.Error())
+	}
+
+	return &models.CreateVerification{
+		Verification: *verification,
+		Token:        token,
+		Code:         code,
+	}, nil
 }
 
 func (s *AuthService) CheckOAuthState(state string) (bool, error) {

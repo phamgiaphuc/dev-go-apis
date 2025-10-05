@@ -36,7 +36,7 @@ CREATE TABLE "verifications" (
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
-  CONSTRAINT verification_identifier_value_unique UNIQUE (identifier, value)
+  CONSTRAINT verification_user_id_identifier_unique UNIQUE (user_id, identifier)
 );
 
 CREATE TABLE "sessions" (

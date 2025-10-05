@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
-	"time"
 
 	"dev-go-apis/internal/lib"
 	"dev-go-apis/internal/middleware"
@@ -22,7 +21,7 @@ type IAuthService interface {
 	GenerateOAuthState(prefix string) (string, error)
 	CheckOAuthState(state string) (bool, error)
 	LoginWithGoogle(user *models.GoogleAccountInfo) (*models.User, error)
-	GenerateVerificationToken(userVerification *models.UserVerification, duration time.Duration) (*models.JwtUserVerificationToken, error)
+	CreateEmailVerification(verification *models.Verification) (*models.CreateVerification, error)
 }
 
 type ISessionService interface {
@@ -84,24 +83,18 @@ func (contl *AuthController) Login(ctx *gin.Context) {
 	}
 
 	if !user.EmailVerified {
-		userVerification := &models.UserVerification{
+		result, err := contl.AuthService.CreateEmailVerification(&models.Verification{
 			UserID:     user.ID,
 			Identifier: models.EmailVerifiedIdentifier,
-		}
-		payload, err := contl.AuthService.GenerateVerificationToken(userVerification, time.Minute*5)
+		})
 		if err != nil {
-			lib.SendErrorResponse(ctx, lib.InternalServerError.WithStack(err.Error()))
+			ctx.Error(lib.InternalServerError.WithStack(err.Error()))
 			return
 		}
-		if _, err := lib.SendWelcomeEmail(user.Email, payload.Token, user.Name); err != nil {
-			lib.SendErrorResponse(ctx, lib.InternalServerError.WithStack(err.Error()))
-			return
-		}
+		lib.SendEmailVerification(user.Email, user.Name, result.Token)
 		lib.SendSucceedResponse(ctx, &models.LoginResponse{
 			User:       *user,
-			Token:      payload.Token,
 			IsVerified: user.EmailVerified,
-			ExpiredAt:  payload.ExpiredAt,
 		})
 		return
 	}
@@ -229,7 +222,19 @@ func (contl *AuthController) Register(ctx *gin.Context) {
 		return
 	}
 
-	lib.SendSucceedResponse(ctx, &models.RegisterResponse{User: *user, Token: "", IsVerified: user.EmailVerified})
+	result, err := contl.AuthService.CreateEmailVerification(&models.Verification{
+		UserID:     user.ID,
+		Identifier: models.EmailVerifiedIdentifier,
+	})
+	if err != nil {
+		ctx.Error(lib.InternalServerError.WithStack(err.Error()))
+		return
+	}
+	lib.SendWelcomeEmail(user.Email, user.Name, result.Token)
+	lib.SendSucceedResponse(ctx, &models.LoginResponse{
+		User:       *user,
+		IsVerified: user.EmailVerified,
+	})
 }
 
 // RefreshToken godoc

@@ -1,12 +1,12 @@
 package emails
 
-templ Welcome(fullName string, verifyLink string) {
+templ EmailVerification(fullName string, verifyLink string) {
 	<!DOCTYPE html>
 	<html>
 		<head>
 			<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 			<meta name="viewport" content="width=device-width, initial-scale=1"/>
-			<title>Welcome to Acus Dev</title>
+			<title>Welcome back to Acus Dev</title>
 		</head>
 		<body style="margin:0;padding:0;background-color:#f5f5f5;font-family:Arial, sans-serif;">
 			<table role="presentation" width="100%" style="max-width:720px;background-color:#ffffff;margin:0 auto">
@@ -17,7 +17,7 @@ templ Welcome(fullName string, verifyLink string) {
 							Welcome to Acus Dev! We're very excited to have you on board.
 						</p>
 						<p style="color:#525252;font-size:14px;margin:0 0 20px 0;">
-							To get started with Acus Dev, Please click the link below and the link will remain active for 5 minutes:
+							To verify your account, please click the link below and the link will remain active for 5 minutes:
 						</p>
 						<a
 							href={ verifyLink }

@@ -30,11 +30,6 @@ type UserWithAccount struct {
 	Account Account `json:"account" db:"account"`
 }
 
-type UserVerification struct {
-	UserID     uuid.UUID              `json:"user_id"`
-	Identifier VerificationIdentifier `json:"identifier"`
-}
-
 type UserWithClaims struct {
 	UserID    uuid.UUID `json:"user_id"`
 	SessionID uuid.UUID `json:"session_id"`

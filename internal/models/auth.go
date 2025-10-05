@@ -1,16 +1,7 @@
 package models
 
 import (
-	"time"
-
 	"github.com/golang-jwt/jwt/v5"
-)
-
-type VerificationIdentifier string
-
-const (
-	EmailVerifiedIdentifier VerificationIdentifier = "email-verified"
-	PasswordResetIdentifier VerificationIdentifier = "password-reset"
 )
 
 type RegisterRequest struct {
@@ -29,14 +20,9 @@ type JwtUserPayload struct {
 	jwt.RegisteredClaims
 }
 
-type JwtUserVerification struct {
-	UserVerification
+type JwtVerification struct {
+	Verification
 	jwt.RegisteredClaims
-}
-
-type JwtUserVerificationToken struct {
-	Token     string
-	ExpiredAt time.Time
 }
 
 type JwtTokens struct {
@@ -45,17 +31,15 @@ type JwtTokens struct {
 }
 
 type LoginResponse struct {
-	User       User      `json:"user"`
-	Token      string    `json:"token"`
-	IsVerified bool      `json:"is_verified"`
-	ExpiredAt  time.Time `json:"expired_at,omitempty"`
+	User       User   `json:"user"`
+	Token      string `json:"token,omitempty"`
+	IsVerified bool   `json:"is_verified"`
 }
 
 type RegisterResponse struct {
-	User       `json:"user"`
-	Token      string    `json:"token"`
-	IsVerified bool      `json:"is_verified"`
-	ExpiredAt  time.Time `json:"expired_at"`
+	User       User   `json:"user"`
+	Token      string `json:"token,omitempty"`
+	IsVerified bool   `json:"is_verified"`
 }
 
 type RefreshTokenResponse struct {

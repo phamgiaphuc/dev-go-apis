@@ -72,12 +72,13 @@ func (r *Router) InitRoutes() http.Handler {
 	sessionRepo := session.NewSessionRepository(r.DBClient)
 	permissionRepo := permission.NewPermissionRepository(r.DBClient)
 	roleRepo := role.NewRoleRepository(r.DBClient)
+	authRepo := auth.NewAuthRepository(r.DBClient)
 
 	/**
 	 * Services
 	 */
 	cacheService := cache.NewCacheService(cacheRepo)
-	authService := auth.NewAuthService(userRepo, cacheRepo)
+	authService := auth.NewAuthService(userRepo, cacheRepo, authRepo)
 	userService := user.NewUserService(userRepo, roleRepo)
 	sessionService := session.NewSessionService(sessionRepo)
 	permissionService := permission.NewPermissionService(permissionRepo)

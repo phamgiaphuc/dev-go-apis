@@ -8,7 +8,7 @@ package emails
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
-func Welcome(fullName string, verifyLink string) templ.Component {
+func EmailVerification(fullName string, verifyLink string) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -29,27 +29,27 @@ func Welcome(fullName string, verifyLink string) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!doctype html><html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Welcome to Acus Dev</title></head><body style=\"margin:0;padding:0;background-color:#f5f5f5;font-family:Arial, sans-serif;\"><table role=\"presentation\" width=\"100%\" style=\"max-width:720px;background-color:#ffffff;margin:0 auto\"><tr><td style=\"padding:36px;\"><p style=\"font-weight:600;font-size:18px;margin:0 0 20px 0;\">Hi, ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!doctype html><html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Welcome back to Acus Dev</title></head><body style=\"margin:0;padding:0;background-color:#f5f5f5;font-family:Arial, sans-serif;\"><table role=\"presentation\" width=\"100%\" style=\"max-width:720px;background-color:#ffffff;margin:0 auto\"><tr><td style=\"padding:36px;\"><p style=\"font-weight:600;font-size:18px;margin:0 0 20px 0;\">Hi, ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var2 string
 		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(fullName)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/views/emails/welcome.templ`, Line: 15, Col: 81}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/views/emails/email-verification.templ`, Line: 15, Col: 81}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</p><p style=\"color:#525252;font-size:14px;margin:0 0 20px 0;\">Welcome to Acus Dev! We're very excited to have you on board.</p><p style=\"color:#525252;font-size:14px;margin:0 0 20px 0;\">To get started with Acus Dev, Please click the link below and the link will remain active for 5 minutes:</p><a href=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</p><p style=\"color:#525252;font-size:14px;margin:0 0 20px 0;\">Welcome to Acus Dev! We're very excited to have you on board.</p><p style=\"color:#525252;font-size:14px;margin:0 0 20px 0;\">To verify your account, please click the link below and the link will remain active for 5 minutes:</p><a href=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var3 templ.SafeURL
 		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinURLErrs(verifyLink)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/views/emails/welcome.templ`, Line: 23, Col: 24}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/views/emails/email-verification.templ`, Line: 23, Col: 24}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 		if templ_7745c5c3_Err != nil {

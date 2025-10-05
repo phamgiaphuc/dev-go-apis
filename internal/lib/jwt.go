@@ -16,26 +16,18 @@ var (
 	VERIFIED_EMAIL_TTL_DURATION = time.Minute * 5
 )
 
-func SignVerificationToken(payload *models.UserVerification, duration time.Duration) (*models.JwtUserVerificationToken, error) {
+func SignVerificationToken(payload *models.Verification, expiredAt time.Time) (string, error) {
 	now := time.Now()
-	expiredAt := now.Add(duration)
-	claims := models.JwtUserVerification{
-		UserVerification: *payload,
+	claims := models.JwtVerification{
+		Verification: *payload,
 		RegisteredClaims: jwt.RegisteredClaims{
 			IssuedAt:  jwt.NewNumericDate(now),
 			ExpiresAt: jwt.NewNumericDate(expiredAt),
 		},
 	}
 
-	tok, err := jwt.NewWithClaims(jwt.SigningMethodHS256, claims).SignedString([]byte(VERIFICATION_TOKEN_SECRET))
-	if err != nil {
-		return nil, err
-	}
-
-	return &models.JwtUserVerificationToken{
-		Token:     tok,
-		ExpiredAt: expiredAt,
-	}, nil
+	tok := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	return tok.SignedString([]byte(VERIFICATION_TOKEN_SECRET))
 }
 
 func SignAccessToken(payload *models.UserWithClaims) (string, error) {
