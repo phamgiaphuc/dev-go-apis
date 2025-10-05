@@ -3,7 +3,6 @@ package models
 import (
 	"time"
 
-	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 )
 
@@ -31,10 +30,14 @@ type UserWithAccount struct {
 	Account Account `json:"account" db:"account"`
 }
 
+type UserVerification struct {
+	UserID     uuid.UUID              `json:"user_id"`
+	Identifier VerificationIdentifier `json:"identifier"`
+}
+
 type UserWithClaims struct {
 	UserID    uuid.UUID `json:"user_id"`
 	SessionID uuid.UUID `json:"session_id"`
-	jwt.RegisteredClaims
 }
 
 type UserWithAccounts struct {

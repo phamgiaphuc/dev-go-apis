@@ -1,0 +1,48 @@
+package emails
+
+templ Welcome(fullName string, verifyLink string) {
+	<!DOCTYPE html>
+	<html>
+		<head>
+			<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+			<meta name="viewport" content="width=device-width, initial-scale=1"/>
+			<title>Welcome to Acus Dev</title>
+		</head>
+		<body style="margin:0;padding:0;background-color:#f5f5f5;font-family:Arial, sans-serif;">
+			<table role="presentation" width="100%" style="max-width:720px;background-color:#ffffff;margin:0 auto">
+				<tr>
+					<td style="padding:36px;">
+						<p style="font-weight:600;font-size:18px;margin:0 0 20px 0;">Hi, { fullName }</p>
+						<p style="color:#525252;font-size:14px;margin:0 0 20px 0;">
+							Welcome to Acus Dev! We're very excited to have you on board.
+						</p>
+						<p style="color:#525252;font-size:14px;margin:0 0 20px 0;">
+							To get started with Acus Dev, Please click the link below and the link will remain active for 5 minutes:
+						</p>
+						<a
+							href={ verifyLink }
+							target="_blank"
+							style="display:inline-block;text-decoration:none;background-color:#2563eb;color:#ffffff;font-size:14px;line-height:40px;padding:0 16px;margin:0 0 20px 0;"
+						>
+							Confirm your account
+						</a>
+						<p style="color:#525252;font-size:14px;margin: 0 0 2px 0">Or use this link:</p>
+						<a
+							href={ verifyLink }
+							target="_blank"
+							style="color:#2563eb;text-decoration:none;font-size:14px;"
+						>
+							{ verifyLink[:80] + "..." }
+						</a>
+						<p style="color:#525252;font-size:14px;margin:20px 0 20px 0;">
+							Need help, or have questions? Please contact our support service via
+							<a href="mailto:support@mail.acusdev.com" style="color:#2563eb;text-decoration:none;">support@mail.acusdev.com</a>
+						</p>
+						<p style="color:#525252;font-size:14px;margin:20px 0 0 0;">Yours truly,</p>
+						<p style="color:#525252;font-size:14px;margin:2px 0 0 0;">Acus Dev Team</p>
+					</td>
+				</tr>
+			</table>
+		</body>
+	</html>
+}

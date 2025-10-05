@@ -5,13 +5,11 @@ package views
 
 //lint:file-ignore SA4006 This context is only used if a nested component is present.
 
-import (
-	"dev-go-apis/internal/models"
-	"dev-go-apis/internal/views/components"
+import "github.com/a-h/templ"
+import templruntime "github.com/a-h/templ/runtime"
 
-	"github.com/a-h/templ"
-	templruntime "github.com/a-h/templ/runtime"
-)
+import "dev-go-apis/internal/views/components"
+import "dev-go-apis/internal/models"
 
 func Index() templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
@@ -90,11 +88,7 @@ func Index() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = components.Feature(models.IntermediateStatus, "Log in with Facebook").Render(ctx, templ_7745c5c3_Buffer)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = components.Feature(models.IntermediateStatus, "Log in with GitHub").Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = components.Feature(models.IntermediateStatus, "2FA TOTP-based").Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -134,7 +128,7 @@ func Index() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = components.Feature(models.IntermediateStatus, "Implement email service (Resend)").Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = components.Feature(models.CheckStatus, "Implement email service (Resend)").Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -146,11 +140,11 @@ func Index() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = components.Feature(models.IntermediateStatus, "Activate account").Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = components.Feature(models.CheckStatus, "Welcome new user").Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = components.Feature(models.IntermediateStatus, "OTP verification code").Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = components.Feature(models.IntermediateStatus, "Re-verify user's email").Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

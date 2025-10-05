@@ -27,8 +27,12 @@ var (
 	REDIS_URL      = GetEnvString("REDIS_URL", "")
 
 	// Secret
-	ACCESS_TOKEN_SECRET  = GetEnvString("ACCESS_TOKEN_SECRET", "@secret123")
-	REFRESH_TOKEN_SECRET = GetEnvString("REFRESH_TOKEN_SECRET", "@secret123")
-	ACCESS_TOKEN_TTL     = GetEnvString("ACCESS_TOKEN_TTL", "30m")
-	REFRESH_TOKEN_TTL    = GetEnvString("REFRESH_TOKEN_TTL", "7d")
+	ACCESS_TOKEN_SECRET       = GetEnvString("ACCESS_TOKEN_SECRET", "@secret123")
+	REFRESH_TOKEN_SECRET      = GetEnvString("REFRESH_TOKEN_SECRET", "@secret123")
+	ACCESS_TOKEN_TTL          = GetEnvString("ACCESS_TOKEN_TTL", "30m")
+	REFRESH_TOKEN_TTL         = GetEnvString("REFRESH_TOKEN_TTL", "7d")
+	VERIFICATION_TOKEN_SECRET = GetEnvString("VERIFICATION_TOKEN_SECRET", "@secret123")
+
+	// Resend
+	RESEND_API_KEY = GetEnvString("RESEND_API_KEY", "")
 )

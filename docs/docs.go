@@ -644,7 +644,13 @@ const docTemplate = `{
         "models.LoginResponse": {
             "type": "object",
             "properties": {
-                "access_token": {
+                "expired_at": {
+                    "type": "string"
+                },
+                "is_verified": {
+                    "type": "boolean"
+                },
+                "token": {
                     "type": "string"
                 },
                 "user": {
@@ -668,7 +674,7 @@ const docTemplate = `{
         "models.RefreshTokenResponse": {
             "type": "object",
             "properties": {
-                "access_token": {
+                "token": {
                     "type": "string"
                 }
             }
@@ -696,35 +702,17 @@ const docTemplate = `{
         "models.RegisterResponse": {
             "type": "object",
             "properties": {
-                "created_at": {
+                "expired_at": {
                     "type": "string"
                 },
-                "email": {
-                    "type": "string"
-                },
-                "email_verified": {
+                "is_verified": {
                     "type": "boolean"
                 },
-                "id": {
+                "token": {
                     "type": "string"
                 },
-                "image": {
-                    "type": "string"
-                },
-                "is_banned": {
-                    "type": "boolean"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "role": {
-                    "type": "string"
-                },
-                "role_id": {
-                    "type": "integer"
-                },
-                "updated_at": {
-                    "type": "string"
+                "user": {
+                    "$ref": "#/definitions/models.User"
                 }
             }
         },

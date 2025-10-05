@@ -59,8 +59,7 @@ templ Index() {
 								@components.Feature(models.CheckStatus, "Refresh token")
 								@components.Feature(models.CheckStatus, "Log out")
 								@components.Feature(models.CheckStatus, "Log in with Google")
-								@components.Feature(models.IntermediateStatus, "Log in with Facebook")
-								@components.Feature(models.IntermediateStatus, "Log in with GitHub")
+								@components.Feature(models.IntermediateStatus, "2FA TOTP-based")
 							</div>
 						</div>
 						<div>
@@ -82,11 +81,11 @@ templ Index() {
 						<div>
 							<label class="font-medium">Emails</label>
 							<div class="flex flex-col mt-2 gap-1">
-								@components.Feature(models.IntermediateStatus, "Implement email service (Resend)")
+								@components.Feature(models.CheckStatus, "Implement email service (Resend)")
 								@components.Feature(models.IntermediateStatus, "Email templates")
 								<div class="flex flex-col ml-6 gap-1">
-									@components.Feature(models.IntermediateStatus, "Activate account")
-									@components.Feature(models.IntermediateStatus, "OTP verification code")
+									@components.Feature(models.CheckStatus, "Welcome new user")
+									@components.Feature(models.IntermediateStatus, "Re-verify user's email")
 									@components.Feature(models.IntermediateStatus, "Password reset")
 								</div>
 							</div>

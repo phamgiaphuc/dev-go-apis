@@ -18,7 +18,6 @@ type IRoleRepository interface {
 type ICacheRepository interface {
 	SetValue(string, interface{}, time.Duration) error
 	GetValue(string, interface{}) error
-	GetKeys(string) ([]string, error)
 }
 
 type RoleService struct {

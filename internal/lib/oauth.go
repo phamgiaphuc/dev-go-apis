@@ -1,13 +1,19 @@
 package lib
 
 import (
+	"time"
+
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
 )
 
 var (
+	StateDuration = time.Minute * 3
+)
+
+var (
 	GoogleStatePrefix = "G"
-	GoogleScrops      = []string{
+	GoogleScopes      = []string{
 		"https://www.googleapis.com/auth/userinfo.email",
 		"https://www.googleapis.com/auth/userinfo.profile",
 	}
@@ -16,7 +22,7 @@ var (
 		RedirectURL:  GOOGLE_REDIRECT_URL,
 		ClientID:     GOOGLE_CLIENT_ID,
 		ClientSecret: GOOGLE_CLIENT_SECRET,
-		Scopes:       GoogleScrops,
+		Scopes:       GoogleScopes,
 		Endpoint:     google.Endpoint,
 	}
 )

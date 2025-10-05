@@ -44,6 +44,7 @@ services:
       redis:
         condition: service_healthy
     environment:
+      GIN_MODE: ${GIN_MODE}
       DATABASE_URL: ${DATABASE_URL}
       REDIS_URL: ${REDIS_URL}
       PORT: ${PORT}
@@ -56,6 +57,7 @@ services:
       ACCESS_TOKEN_TTL: ${ACCESS_TOKEN_TTL}
       REFRESH_TOKEN_TTL: ${REFRESH_TOKEN_TTL}
       MIGRATION_MODE: ${MIGRATION_MODE}
+      RESEND_API_KEY: ${RESEND_API_KEY}
     ports:
       - ${PORT:-8001}:${PORT:-8001}
 

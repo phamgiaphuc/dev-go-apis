@@ -21,7 +21,7 @@ type IUserRepository interface {
 type ICacheRepository interface {
 	SetValue(string, interface{}, time.Duration) error
 	GetValue(string, interface{}) error
-	DeleteValue(keys ...string) (bool, error)
+	DeleteValue(keys []string) (bool, error)
 }
 
 type AuthService struct {
@@ -36,6 +36,14 @@ func NewAuthService(userRepo IUserRepository, cacheRepo ICacheRepository) *AuthS
 	}
 }
 
+func (s *AuthService) GenerateVerificationToken(userVerification *models.UserVerification, duration time.Duration) (*models.JwtUserVerificationToken, error) {
+	token, err := lib.SignVerificationToken(userVerification, duration)
+	if err != nil {
+		return nil, fmt.Errorf("failed to generate verification token: %s", err.Error())
+	}
+	return token, nil
+}
+
 func (s *AuthService) CheckOAuthState(state string) (bool, error) {
 	var value int
 	err := s.CacheRepo.GetValue(state, &value)
@@ -47,7 +55,7 @@ func (s *AuthService) CheckOAuthState(state string) (bool, error) {
 
 func (s *AuthService) GenerateOAuthState(prefix string) (string, error) {
 	state := fmt.Sprintf("%s%s", prefix, lib.GenerateOTP(uint32(8)))
-	if err := s.CacheRepo.SetValue(state, 1, time.Minute*5); err != nil {
+	if err := s.CacheRepo.SetValue(state, 1, lib.StateDuration); err != nil {
 		return "", fmt.Errorf("failed to generate oauth state: %s", err.Error())
 	}
 	return state, nil
@@ -134,7 +142,7 @@ func (s *AuthService) Login(body *models.LoginRequest) (*models.User, error) {
 		UserID:     user.ID,
 		ProviderId: models.ProviderCredential,
 	})
-	if err != nil {
+	if err != nil || account == nil {
 		return nil, fmt.Errorf("account not found")
 	}
 	if err := lib.ComparePassword(account.Password, body.Password); err != nil {
